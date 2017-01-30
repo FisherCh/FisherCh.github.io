@@ -85,23 +85,26 @@
 
 
 <meta name="description" content="The artical is a research about the Recognition of licence plate.
-Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by {Fisher url:https://www.google.com/ncr}, whi">
+Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by Fisher, which
+The Video代码[] [title] [url] [l">
 <meta property="og:type" content="article">
 <meta property="og:title" content="The Research Of Licence Plate Recognition">
 <meta property="og:url" content="FisherCh.github.io/2017/01/30/The-Research-Of-Licence-Plate-Recognition/index.html">
 <meta property="og:site_name" content="Blog Of FisherCh">
 <meta property="og:description" content="The artical is a research about the Recognition of licence plate.
-Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by {Fisher url:https://www.google.com/ncr}, whi">
+Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by Fisher, which
+The Video代码[] [title] [url] [l">
 <meta property="og:image" content="FisherCh.github.io/img/avatar.png">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP1.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP2.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP3.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP4.jpg">
-<meta property="og:updated_time" content="2017-01-30T16:17:29.491Z">
+<meta property="og:updated_time" content="2017-01-30T17:16:38.190Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="The Research Of Licence Plate Recognition">
 <meta name="twitter:description" content="The artical is a research about the Recognition of licence plate.
-Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by {Fisher url:https://www.google.com/ncr}, whi">
+Using Neural NetworksThe Basical TheoryThe neural network algorithm was first proposed by Fisher, which
+The Video代码[] [title] [url] [l">
 <meta name="twitter:image" content="FisherCh.github.io/img/avatar.png">
 
 
@@ -335,8 +338,10 @@ Using Neural NetworksThe Basical TheoryThe neural network algorithm was first pr
 
       
         <p>The artical is a research about the Recognition of licence plate.</p>
-<h1 id="Using-Neural-Networks"><a href="#Using-Neural-Networks" class="headerlink" title="Using Neural Networks"></a>Using Neural Networks</h1><h2 id="The-Basical-Theory"><a href="#The-Basical-Theory" class="headerlink" title="The Basical Theory"></a>The Basical Theory</h2><p>The neural network algorithm was first proposed by {Fisher url:<a href="https://www.google.com/ncr}" target="_blank" rel="external">https://www.google.com/ncr}</a>, which</p>
-<h1 id="The-Video"><a href="#The-Video" class="headerlink" title="The Video"></a>The Video</h1><p>代码<br><figure class="highlight plain"><figcaption><span>[] [title] [url] [link text]</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">code snippet</div></pre></td></tr></table></figure><br>视频<br><div class="video-container"><iframe src="//www.youtube.com/embed/J3xmnEGMtQE" frameborder="0" allowfullscreen></iframe></div><br>图片<br><img src="/img/avatar.png" alt="测试图片"></p>
+<h1 id="Using-Neural-Networks"><a href="#Using-Neural-Networks" class="headerlink" title="Using Neural Networks"></a>Using Neural Networks</h1><h2 id="The-Basical-Theory"><a href="#The-Basical-Theory" class="headerlink" title="The Basical Theory"></a>The Basical Theory</h2><p>The neural network algorithm was first proposed by <a href="https://www.google.com/ncr" target="_blank" rel="external">Fisher</a>, which</p>
+<h1 id="The-Video"><a href="#The-Video" class="headerlink" title="The Video"></a>The Video</h1><p>代码<br><figure class="highlight plain"><figcaption><span>[] [title] [url] [link text]</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">code snippet</div></pre></td></tr></table></figure><br>视频<br><div class="video-container"><iframe src="//www.youtube.com/embed/J3xmnEGMtQE" frameborder="0" allowfullscreen></iframe></div><br>图片</p>
+<div align="center"><br><img src="/img/avatar.png" alt="测试图片"><br></div>
+
 <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>本文介绍了一个针对中国普通车牌的简易识别系统，包括车牌位置提取、字符分割以及对应字符识别，文章所有代码均基于MATLAB实现。</p>
 <h1 id="位置提取"><a href="#位置提取" class="headerlink" title="位置提取"></a>位置提取</h1><h2 id="基于颜色的背景分离"><a href="#基于颜色的背景分离" class="headerlink" title="基于颜色的背景分离"></a>基于颜色的背景分离</h2><p>本文首先考虑对仅包含一个车牌的图片，如下图所示。<br><img src="/img/LicencePlate/LP1.jpg" alt="本文的测试图片"><br>图片中仅包含一个车牌，且一般车牌为蓝色，车牌像素点[R,G,B]对应值为[45,54,150]，直接通过蓝色通道减其他颜色通道。并对所得结果其进行二值化。为避免二值操作将车牌部分过滤，通过实践对比，将二值化的阈值设置为0.3。<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pic_BW = im2bw(pic_Ori(:,:,<span class="number">3</span>)-pic_Ori(:,:,<span class="number">1</span>),<span class="number">0.3</span>);</div></pre></td></tr></table></figure><br>此操作得到的输出如下所示：<br><img src="/img/LicencePlate/LP2.jpg" alt="二值化分离车牌"><br>图中左上角的图显示的是二值化并中值滤波后的效果，将车牌位置很好地分离出来。当然，不可置否的是，图片中车牌部分的颜色与车辆与环境的颜色区分度较高，故使用该种方法能迅速将其分离，一些鲁棒性强的方法将在后续的文章中说明与测试。</p>
 <h2 id="一种简单的车牌区域提取"><a href="#一种简单的车牌区域提取" class="headerlink" title="一种简单的车牌区域提取"></a>一种简单的车牌区域提取</h2><p>在车牌区域提取问题上，已经有许多成熟且鲁棒性强的方法：Koval等人提出根据长宽比等车牌参数搜索车牌区域[1]，南京航空大学的徐文涛等人提出了基于图像投影波峰波谷数量的检测方法[2]，这些方法均将会在后续的文章进行比较。<br>参考这些方法以及结合本次样本的实际情况，采用了较为简单的仅通过投影进行判断。投影结果如上图第二行中两个子图所示（水平投影（左）与竖直投影（右））。<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">% cut the License Plate area.</span></div><div class="line">Level = sum(pic_BW)&gt;Threshold;</div><div class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">3</span>);plot(Level);axis([<span class="number">0</span> length(Level) <span class="number">0</span> <span class="number">1</span>])</div><div class="line">Level_= <span class="built_in">find</span>(Level&gt;<span class="number">0</span>);Left = Level_(<span class="number">1</span>); Right = Level_(<span class="keyword">end</span>);</div><div class="line"></div><div class="line">Vertical = sum(pic_BW,<span class="number">2</span>)&gt;Threshold;</div><div class="line">subplot(<span class="number">2</span>,<span class="number">2</span>,<span class="number">4</span>);plot(Vertical);axis([<span class="number">0</span> length(Vertical) <span class="number">0</span> <span class="number">1</span>])</div><div class="line">Vertical_= <span class="built_in">find</span>(Vertical&gt;<span class="number">0</span>);Up = Vertical_(<span class="number">1</span>);Down = Vertical_(<span class="keyword">end</span>);</div></pre></td></tr></table></figure><br>在判断过程中，为降低噪点影响，引入阈值threshold。首先对二值图片分别往下投影，判断每列白色像素点（值为1）的点数是否大于threshold。向量Level每个值表示每一列的白像素点数是否符合预设条件，符合则为1，否则为0。</p>

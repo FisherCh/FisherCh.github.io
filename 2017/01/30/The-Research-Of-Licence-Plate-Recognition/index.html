@@ -100,7 +100,8 @@
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP2.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP3.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP4.jpg">
-<meta property="og:updated_time" content="2017-02-09T16:37:54.657Z">
+<meta property="og:image" content="http://latex.codecogs.com/gif.latex?C=\sum_{i=1}^{n}\sum_{j=1}^{m}a_{i,j}-b_{i,j}">
+<meta property="og:updated_time" content="2017-02-10T09:03:40.263Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="The Research Of Licence Plate Recognition">
 <meta name="twitter:description" content="The artical is a research about the Recognition of licence plate.
@@ -352,7 +353,8 @@
 
 <p>矫正后，为了方便对字符进行识别，首先需将字符逐个提取。将车牌图片进行二值化处理，可得到清晰的字符图像。考虑到中国大陆的一般蓝色车牌均由7个字符构成（省+市+5位号码），且前两位与后五位之间有一分隔符“·”，可采取等宽分割的方式提取字符。宽度step由式子：车牌长度÷（字符数numChar+修正值）得到。考虑到字符中含有分隔符，实际宽度略小，选择修正值为0.3。在确定宽度step后，从两端提取字符。得到的结果如下图所示：</p>
 <p><div align="center"><br><img src="/img/LicencePlate/LP4.jpg" class="img-shadow"><br></div><br>以下是字符提取部分的代码，通过for循环从两端显示图像<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">%% Character segmentation</span></div><div class="line"><span class="comment">% mostly, a chinese License Plate contains 7 characters</span></div><div class="line">License = im2bw(License);</div><div class="line">position= sum(License)&gt;<span class="number">5</span>;</div><div class="line">numChar = <span class="number">7</span>;</div><div class="line">step = <span class="built_in">round</span>( <span class="built_in">length</span>(License)/(numChar+<span class="number">0.3</span>) );</div><div class="line">figure(<span class="number">3</span>);</div><div class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:<span class="number">2</span></div><div class="line">    subChar = License(:,<span class="number">1</span>+(<span class="built_in">i</span><span class="number">-1</span>)*step:<span class="built_in">i</span>*step,:);</div><div class="line">    subplot(<span class="number">1</span>,numChar,<span class="built_in">i</span>)</div><div class="line">    imshow(subChar)</div><div class="line"><span class="keyword">end</span></div><div class="line"><span class="keyword">for</span> <span class="built_in">i</span> = numChar:<span class="number">-1</span>:<span class="number">3</span></div><div class="line">    subChar = License(:,<span class="keyword">end</span>-(numChar-<span class="built_in">i</span>+<span class="number">1</span>)*step:<span class="keyword">end</span>-(numChar-<span class="built_in">i</span>)*step,:);</div><div class="line">    subplot(<span class="number">1</span>,numChar,<span class="built_in">i</span>)</div><div class="line">    imshow(subChar)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
-<h1 id="文字识别"><a href="#文字识别" class="headerlink" title="文字识别"></a>文字识别</h1><p>文字识别部分考虑用神经网络模型。</p>
+<h1 id="文字识别"><a href="#文字识别" class="headerlink" title="文字识别"></a>文字识别</h1><p>文字识别部分通过以下方式进行：</p>
+<p><div align="center"><br><img src="http://latex.codecogs.com/gif.latex?C=\sum_{i=1}^{n}\sum_{j=1}^{m}a_{i,j}-b_{i,j}"><br></div></p>
 <h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>[1] Koval V, Turchenko V, Kochan V, et al. Smart license plate recognition system based on image processing using neural network[C]//Intelligent Data Acquisition and Advanced Computing Systems: Technology and Applications, 2003. Proceedings of the Second IEEE International Workshop on. IEEE, 2003: 123-127.</p>
 <p>[2] 栾众楷, 徐文涛, 刘冰. 基于安卓平台的车牌识别系统的设计与实现[J]. 电子设计工程, 2016, 24(9): 176-179.</p>
 <h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><p>完整代码：<a href="https://github.com/FisherCh/LPR_code_0/blob/master/main.m" target="_blank" rel="external">Github</a></p>
@@ -702,28 +704,6 @@
   
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
-
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  
-
 
   
 

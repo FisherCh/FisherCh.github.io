@@ -85,21 +85,27 @@
 
 
 <meta name="description" content="前文介绍了一个针对中国普通车牌的简易识别系统，包括车牌位置提取、字符分割以及对应字符识别，文章所有代码均基于MATLAB实现。本文就前文中的一些不合理方法进行改进。
-位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼好，暂不打算改。
-#">
+位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼**好，暂不打算改。不过遇到以下的图片就完全歇菜，姑且撑其为“地狱难度”，这类图等博主有空再挑战下。
+
+外接矩形版本二采用外界矩形">
 <meta property="og:type" content="article">
 <meta property="og:title" content="The-Research-Of-Licence-Plate-Recognition_II">
 <meta property="og:url" content="FisherCh.github.io/2017/03/04/The-Research-Of-Licence-Plate-Recognition-II/index.html">
 <meta property="og:site_name" content="Blog Of FisherCh">
 <meta property="og:description" content="前文介绍了一个针对中国普通车牌的简易识别系统，包括车牌位置提取、字符分割以及对应字符识别，文章所有代码均基于MATLAB实现。本文就前文中的一些不合理方法进行改进。
-位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼好，暂不打算改。
-#">
-<meta property="og:updated_time" content="2017-04-05T16:28:51.725Z">
+位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼**好，暂不打算改。不过遇到以下的图片就完全歇菜，姑且撑其为“地狱难度”，这类图等博主有空再挑战下。
+
+外接矩形版本二采用外界矩形">
+<meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP_hell.jpg">
+<meta property="og:image" content="FisherCh.github.io/img/LicencePlate/LP_Binary.jpg">
+<meta property="og:updated_time" content="2017-04-06T15:58:59.774Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="The-Research-Of-Licence-Plate-Recognition_II">
 <meta name="twitter:description" content="前文介绍了一个针对中国普通车牌的简易识别系统，包括车牌位置提取、字符分割以及对应字符识别，文章所有代码均基于MATLAB实现。本文就前文中的一些不合理方法进行改进。
-位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼好，暂不打算改。
-#">
+位置提取在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼**好，暂不打算改。不过遇到以下的图片就完全歇菜，姑且撑其为“地狱难度”，这类图等博主有空再挑战下。
+
+外接矩形版本二采用外界矩形">
+<meta name="twitter:image" content="FisherCh.github.io/img/LicencePlate/LP_hell.jpg">
 
 
 
@@ -332,9 +338,12 @@
 
       
         <p>前文介绍了一个针对中国普通车牌的简易识别系统，包括车牌位置提取、字符分割以及对应字符识别，文章所有代码均基于MATLAB实现。本文就前文中的一些不合理方法进行改进。</p>
-<h1 id="位置提取"><a href="#位置提取" class="headerlink" title="位置提取"></a>位置提取</h1><p>在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼好，暂不打算改。</p>
-<p># </p>
-
+<h1 id="位置提取"><a href="#位置提取" class="headerlink" title="位置提取"></a>位置提取</h1><p>在前文中，针对大陆车牌的颜色特征，采用了一种两通道相减的方式，该方法受背景的颜色影响大，但效果贼**好，暂不打算改。不过遇到以下的图片就完全歇菜，姑且撑其为“地狱难度”，这类图等博主有空再挑战下。</p>
+<p><div align="center"><br><img src="/img/LicencePlate/LP_hell.jpg" width="80%" class="img-shadow"><br></div></p>
+<h2 id="外接矩形"><a href="#外接矩形" class="headerlink" title="外接矩形"></a>外接矩形</h2><p>版本二采用外界矩形寻找车牌区域。上文通过通道相减的方式能很好地突出车牌的特征，但字符之间常常会产生“断点”，为避免其带来的干扰，对相减后的黑白图进行膨胀，核函数（不知道有没有叫错）由strel函数生成，圆盘半径，大小为6个像素（这里觉得距离的形式影响不大，只要半径够，将字符之间的“裂缝”连起即可）。</p>
+<h2 id="区域筛选"><a href="#区域筛选" class="headerlink" title="区域筛选"></a>区域筛选</h2><p>通过外接矩形得到的区域一般有多个，须对其进行筛选。本文采用的是长宽比以及像素点数（或是说面积）进行判断，通常车牌长宽比处于3.5作又，考虑到在切割时将边框纳入（此时长宽比较低），以及拍摄角度高（长宽比较高）的情况，将判别的边界设得较宽。</p>
+<p><div align="center"><br><img src="/img/LicencePlate/LP_Binary.jpg" width="80%" class="img-shadow"><br></div></p>
+<h1 id="字符分割"><a href="#字符分割" class="headerlink" title="字符分割"></a>字符分割</h1><h2 id="边界切除"><a href="#边界切除" class="headerlink" title="边界切除"></a>边界切除</h2><h2 id="等宽分割"><a href="#等宽分割" class="headerlink" title="等宽分割"></a>等宽分割</h2><h1 id="字符识别"><a href="#字符识别" class="headerlink" title="字符识别"></a>字符识别</h1>
       
     </div>
 
@@ -519,7 +528,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#位置提取"><span class="nav-number">1.</span> <span class="nav-text">位置提取</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#位置提取"><span class="nav-number">1.</span> <span class="nav-text">位置提取</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#外接矩形"><span class="nav-number">1.1.</span> <span class="nav-text">外接矩形</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区域筛选"><span class="nav-number">1.2.</span> <span class="nav-text">区域筛选</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符分割"><span class="nav-number">2.</span> <span class="nav-text">字符分割</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#边界切除"><span class="nav-number">2.1.</span> <span class="nav-text">边界切除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#等宽分割"><span class="nav-number">2.2.</span> <span class="nav-text">等宽分割</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符识别"><span class="nav-number">3.</span> <span class="nav-text">字符识别</span></a></li></ol></div>
             
 
           </div>

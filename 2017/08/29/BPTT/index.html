@@ -93,8 +93,8 @@ RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的
 <meta property="og:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
 RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子">
 <meta property="og:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h\[h_{t-1},x_t\]\)">
-<meta property="og:updated_time" content="2017-08-29T02:03:06.762Z">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)">
+<meta property="og:updated_time" content="2017-08-29T02:06:37.774Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
 <meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
@@ -335,7 +335,7 @@ RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的
 <h1 id="RNN"><a href="#RNN" class="headerlink" title="RNN"></a>RNN</h1><p>RNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：</p>
 <div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div>
 
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h\[h_{t-1},x_t\]\)" style="border:none;"></p>
+<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"></p>
 
       
     </div>

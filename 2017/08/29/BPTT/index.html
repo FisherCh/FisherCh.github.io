@@ -84,26 +84,26 @@
 
 
 
-<meta name="description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，
-其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
+<meta name="description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
+RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的序列信息利用起来。传统的神经网络假定输入样本之间以及各个输">
 <meta property="og:type" content="article">
 <meta property="og:title" content="BPTT(Backpropagation Through Time)">
 <meta property="og:url" content="FisherCh.github.io/2017/08/29/BPTT/index.html">
 <meta property="og:site_name" content="Heterodoxy">
-<meta property="og:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，
-其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
+<meta property="og:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
+RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的序列信息利用起来。传统的神经网络假定输入样本之间以及各个输">
+<meta property="og:image" content="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt1.png">
 <meta property="og:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)">
-<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= y_t=\softmax\(V*s_t\)">
-<meta property="og:updated_time" content="2017-08-29T02:14:52.024Z">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}">
+<meta property="og:updated_time" content="2017-08-29T10:31:20.489Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
-<meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，
-其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
-<meta name="twitter:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
+RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的序列信息利用起来。传统的神经网络假定输入样本之间以及各个输">
+<meta name="twitter:image" content="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt1.png">
 
 
 
@@ -335,11 +335,13 @@ RNNRNN的基本结构如下图所示，
       
 
       
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本文介绍RNN中反向传播的原理，主要内容来自对<a href="http://www.wildml.com/2015/10/recurrent-neural-networks-tutorial-part-3-backpropagation-through-time-and-vanishing-gradients/" target="_blank" rel="external">Backpropagation Through Time and Vanishing Gradients</a>的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为<a href="http://blog.csdn.net/jerr__y/article/details/58598296" target="_blank" rel="external">（译）理解 LSTM 网络</a>讲的十分易懂。</p>
-<h1 id="RNN"><a href="#RNN" class="headerlink" title="RNN"></a>RNN</h1><p>RNN的基本结构如下图所示，</p>
-<p><div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div><br>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：</p>
-<p><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"><br></div><br>假定最终依据第t时刻的状态用于分类，则对$h_t$加个softmax层，式子如下：</p>
-<p><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= y_t=\softmax\(V*s_t\)" style="border:none;"><br></div><br>对分类器的误差衡量一般采用交叉熵损失函数，定义如下：</p>
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本文介绍RNN中反向传播的原理，主要内容来自对<a href="http://www.wildml.com/2015/10/recurrent-neural-networks-tutorial-part-3-backpropagation-through-time-and-vanishing-gradients/" target="_blank" rel="external">Backpropagation Through Time and Vanishing Gradients</a>的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐<a href="http://blog.csdn.net/jerr__y/article/details/58598296" target="_blank" rel="external">（译）理解 LSTM 网络</a>。</p>
+<h1 id="RNN"><a href="#RNN" class="headerlink" title="RNN"></a>RNN</h1><h2 id="RNN简介"><a href="#RNN简介" class="headerlink" title="RNN简介"></a>RNN简介</h2><p>RNN(Recurrent Neural Networks)的一个核心思想是将样本的序列信息利用起来。传统的神经网络假定输入样本之间以及各个输出之间都相互独立，但这个假设对于许多任务显然是不成立的。例如预测一个句子中的下一个词，往往需要结合前文信息。</p>
+<p>之所以称其为Recurrent（递归），是因为网络对他的每个节点（也有看到其他文章称它为cell）采取相同的操作：每一个节点的输出$o<em>t$都与上一个节点的状态$s</em>{t-1}$有关。理论上，RNN可以利用到任意长度序列的信息，然而在实际中往往只能“记得”前几个step的状态（所以有后来的LSTM进行改进）。一个典型的RNN结构如下，右侧为展开后的结果。</p>
+<div align="center"><br><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt1.png" class="img-shadow"><br></div>
+
+<h2 id="RNN结构"><a href="#RNN结构" class="headerlink" title="RNN结构"></a>RNN结构</h2><p>RNN一个单元的内部结构如下图所示，</p>
+<div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div><br>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"><br></div><br>假定最终依据第t时刻的状态用于分类（比如翻译任务中，计算译文的第t个词应该是什么），则对$h_t$加个softmax层，式子如下：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)" style="border:none;"><br></div><br>对分类器的误差衡量一般采用交叉熵损失函数，定义如下，其中$y_t$为已知的标签。式子表示对每一个时刻i（可理解为单词）的误差$-y_i\log(\hat{y_i})$进行累加，作为一个样本（整个句子）的误差。<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})" style="border:none;"><br></div><br>## 一点补充<br><br><br># 反向传播<br>这里RNN权重W的更新和BP神经网络类似，首先求样本误差E对权重的偏导数：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}" style="border:none;"><br></div>
 
       
     </div>
@@ -518,7 +520,7 @@ RNNRNN的基本结构如下图所示，
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">2.</span> <span class="nav-text">RNN</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">2.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN简介"><span class="nav-number">2.1.</span> <span class="nav-text">RNN简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN结构"><span class="nav-number">2.2.</span> <span class="nav-text">RNN结构</span></a></li></ol></li></ol></div>
             
 
           </div>

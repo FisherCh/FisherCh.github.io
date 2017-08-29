@@ -85,20 +85,24 @@
 
 
 <meta name="description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子">
+RNNRNN的基本结构如下图所示，
+其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="BPTT(Backpropagation Through Time)">
 <meta property="og:url" content="FisherCh.github.io/2017/08/29/BPTT/index.html">
 <meta property="og:site_name" content="Heterodoxy">
 <meta property="og:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子">
+RNNRNN的基本结构如下图所示，
+其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
 <meta property="og:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)">
-<meta property="og:updated_time" content="2017-08-29T02:06:37.774Z">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= y_t=\softmax\(V*s_t\)">
+<meta property="og:updated_time" content="2017-08-29T02:14:52.024Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
 <meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为（译）理解 LSTM 网络讲的十分易懂。
-RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子">
+RNNRNN的基本结构如下图所示，
+其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式">
 <meta name="twitter:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 
 
@@ -332,10 +336,10 @@ RNNRNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的
 
       
         <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>本文介绍RNN中反向传播的原理，主要内容来自对<a href="http://www.wildml.com/2015/10/recurrent-neural-networks-tutorial-part-3-backpropagation-through-time-and-vanishing-gradients/" target="_blank" rel="external">Backpropagation Through Time and Vanishing Gradients</a>的翻译与理解。关于RNN与LSTM的原理以及介绍，私以为<a href="http://blog.csdn.net/jerr__y/article/details/58598296" target="_blank" rel="external">（译）理解 LSTM 网络</a>讲的十分易懂。</p>
-<h1 id="RNN"><a href="#RNN" class="headerlink" title="RNN"></a>RNN</h1><p>RNN的基本结构如下图所示，其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：</p>
-<div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div>
-
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"></p>
+<h1 id="RNN"><a href="#RNN" class="headerlink" title="RNN"></a>RNN</h1><p>RNN的基本结构如下图所示，</p>
+<p><div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div><br>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：</p>
+<p><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"><br></div><br>假定最终依据第t时刻的状态用于分类，则对$h_t$加个softmax层，式子如下：</p>
+<p><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= y_t=\softmax\(V*s_t\)" style="border:none;"><br></div><br>对分类器的误差衡量一般采用交叉熵损失函数，定义如下：</p>
 
       
     </div>

@@ -94,12 +94,12 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
 RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的序列信息利用起来。传统的神经网络假定输入样本之间以及各个输">
 <meta property="og:image" content="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt1.png">
 <meta property="og:image" content="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
-<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)">
+<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}">
 <meta property="og:image" content="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt-with-gradients.png">
-<meta property="og:updated_time" content="2017-08-29T11:34:55.171Z">
+<meta property="og:updated_time" content="2017-08-29T14:39:43.889Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
 <meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
@@ -342,7 +342,7 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
 <div align="center"><br><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt1.png" class="img-shadow"><br></div>
 
 <h2 id="RNN结构"><a href="#RNN结构" class="headerlink" title="RNN结构"></a>RNN结构</h2><p>RNN一个单元的内部结构如下图所示，</p>
-<div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div><br>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"><br></div><br>假定最终依据第t时刻的状态用于分类（比如翻译任务中，计算译文的第t个词应该是什么），则对$h_t$加个softmax层，式子如下：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)" style="border:none;"><br></div><br>对分类器的误差衡量一般采用交叉熵损失函数，定义如下，其中$y_t$为已知的标签。式子表示对每一个时刻i（可理解为单词）的误差$-y_i\log(\hat{y_i})$进行累加，作为一个样本（整个句子）的误差。<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})" style="border:none;"><br></div><br>## 一点补充<br><br><br># 反向传播<br>这里RNN权重W的更新和BP神经网络类似，首先求样本误差E对权重的偏导数：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}" style="border:none;"><br></div>
+<div align="center"><br><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"><br></div><br>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&amp;chl= s_t=\tanh\(W_h[h_{t-1},x_t]\" alt="img">)<br><!-- <img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none;"> --><br></div><br>假定最终依据第t时刻的状态用于分类（比如翻译任务中，计算译文的第t个词应该是什么），则对$h_t$加个softmax层，式子如下：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)" style="border:none;"><br></div><br>对分类器的误差衡量一般采用交叉熵损失函数，定义如下，其中$y_t$为已知的标签。式子表示对每一个时刻i（可理解为单词）的误差$-y_i\log(\hat{y_i})$进行累加，作为一个样本（整个句子）的误差。<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})" style="border:none;"><br></div><br>。。。<br>## 一点补充<br>。。。<br><br># 反向传播<br>这里RNN权重W的更新和BP神经网络类似，首先求样本误差E对权重的偏导数：<br><div align="center"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}" style="border:none;"><br></div>
 
 <div align="center"><br><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt-with-gradients.png" class="img-shadow"><br></div>
       

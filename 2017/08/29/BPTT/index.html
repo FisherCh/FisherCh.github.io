@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Tensorflow,RNN," />
+  <meta name="keywords" content="Tensorflow,RNN,translation," />
 
 
 
@@ -97,7 +97,6 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})">
-<meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}">
 <meta property="og:image" content="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt-with-gradients.png">
 <meta property="og:image" content="http://latex.codecogs.com/gif.latex? \frac{\partial E_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial z_3}\frac{\partial z_3}{\partial V}=(\hat{y}_3-y_3)\otimes s_3">
 <meta property="og:image" content="https://chart.googleapis.com/chart?cht=tx&chl= z_3=V \ast s_3">
@@ -113,7 +112,7 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
 ( \prod_{j=k+1}^3 \frac{\partial s_j}{\partial s_{j-1}} )
 \frac{\partial s_k}{\partial W}">
 <meta property="og:image" content="http://nn.readthedocs.io/en/rtd/image/tanh.png">
-<meta property="og:updated_time" content="2017-08-30T14:52:14.287Z">
+<meta property="og:updated_time" content="2017-08-31T09:15:11.797Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
 <meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
@@ -357,39 +356,34 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
 
 <h2 id="RNN结构"><a href="#RNN结构" class="headerlink" title="RNN结构"></a>RNN结构</h2><p>RNN一个单元的内部结构如下图所示，</p>
 <p><img src="http://img.blog.csdn.net/20170228165058708?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"></p>
-<p>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none"></p>
-<p>假定最终依据第t时刻的状态用于分类（比如翻译任务中，计算译文的第t个词应该是什么），则对$h_t$加个softmax层，式子如下：</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)" style="border:none"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})" style="border:none"></p>
+<p>其中$h_t$表示时刻$t$的RNN单元的输出（或是状态State，原文里用的是$s_t$），每一层的输出可由式子表示：<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_t=\tanh\(W_h[h_{t-1},x_t]\)" style="border:none"></p>
+<p>假定最终依据第t时刻的状态用于分类（比如翻译任务中，计算译文的第t个词应该是什么），则对$h_t$加个softmax层，式子如下：<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \hat{y_t}=softmax\(V*s_t\)" style="border:none"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= E_t=-\sum_{i}y_i\log(\hat{y_i})" style="border:none"></p>
 <p>对分类器的误差衡量一般采用交叉熵损失函数，定义如下，其中$y_t$为已知的标签。式子表示对每一个时刻i（可理解为单词）的误差$-y_i\log(\hat{y_i})$进行累加，作为一个样本（整个句子）的误差。</p>
 <p>。。。</p>
 <h2 id="一点补充"><a href="#一点补充" class="headerlink" title="一点补充"></a>一点补充</h2><p>。。。</p>
-<h1 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h1><h2 id="误差累加"><a href="#误差累加" class="headerlink" title="误差累加"></a>误差累加</h2><p>这里RNN权重W的更新和BP神经网络类似，都是求误差对权重的梯度。而有少许不同的是，RNN中首先求每一个t的误差$E_t$对权重$W$的偏导数，再将结果叠加，成为一个样本对权重的误差梯度。</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E}{\partial W}=\sum_{t}\frac{\partial E_t}{\partial W}" style="border:none"></p>
+<h1 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h1><h2 id="误差累加"><a href="#误差累加" class="headerlink" title="误差累加"></a>误差累加</h2><p>这里RNN权重W的更新和BP神经网络类似，都是求误差对权重的梯度。而有少许不同的是，RNN中首先求每一个t的误差$E<em>t$对权重$W$的偏导数，再将结果叠加，成为一个样本对权重的误差梯度。<br>&lt;img src=”<a href="https://chart.googleapis.com/chart?cht=tx&amp;chl=" target="_blank" rel="external">https://chart.googleapis.com/chart?cht=tx&amp;chl=</a> \frac{\partial E}{\partial W}=\sum</em>{t}\frac{\partial E_t}{\partial W}” style=”border:none”&gt;</p>
 <p>RNN中的每一个节点（或是说time step）共用一个矩阵$W$，因而每一处的误差$E_t$都反映了权重$W$是否正确，所以在更新时对每个time step的误差做了累加操作。</p>
 <p><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt-with-gradients.png" class="img-shadow"></p>
-<h2 id="一些推导"><a href="#一些推导" class="headerlink" title="一些推导"></a>一些推导</h2><p>现以中间的一个time step为例进行计算。在计算梯度时引入了微分的链式规则，设t=3，那么有<br><img src="http://latex.codecogs.com/gif.latex? \frac{\partial E_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial z_3}\frac{\partial z_3}{\partial V}=(\hat{y}_3-y_3)\otimes s_3" style="border:none"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= z_3=V \ast s_3" style="border:none"><br>其中，$\otimes$表示两个向量的外积。在这里，原作者推导上式只为说明误差E对V的偏导仅仅与当前的time step有关，因而可以通过简单的矩阵运算求得。</p>
-<p>但是，计算E对W的偏导则有些复杂。首先还是应用链式规则，</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial W}" style="border:none"></p>
-<p>之前说道，$s_3$的值很大程度与上一个time step的状态$s_2$有关，而$s_2$又取决与W与$s_1$，循环往复。</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_3=\tanh(Ux_t + s_2)" style="border:none"></p>
-<p>因此在求对W的偏导时无法将$s_2$视为常数，需对以上链式做进一步扩展。</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\sum_{k=0}^3 \frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial s_k}\frac{\partial s_k}{\partial W}" style="border:none"></p>
+<h2 id="一些推导"><a href="#一些推导" class="headerlink" title="一些推导"></a>一些推导</h2><p>现以中间的一个time step为例进行计算。在计算梯度时引入了微分的链式规则，设t=3，那么有<br><img src="http://latex.codecogs.com/gif.latex? \frac{\partial E_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial z_3}\frac{\partial z_3}{\partial V}=(\hat{y}_3-y_3)\otimes s_3" style="border:none"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= z_3=V \ast s_3" style="border:none"><br>其中，$\otimes$表示两个向量的外积（叉乘）。在这里，原作者推导上式只为说明误差E对V的偏导仅仅与当前的time step有关，因而可以通过简单的矩阵运算求得。</p>
+<p>但是，计算E对W的偏导则有些复杂。首先还是应用链式规则，<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial W}" style="border:none"></p>
+<p>之前说道，$s_3$的值很大程度与上一个time step的状态$s_2$有关，而$s_2$又取决与W与$s_1$，循环往复。<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= s_3=\tanh(Ux_t + s_2)" style="border:none"></p>
+<p>因此在求对W的偏导时无法将$s_2$视为常数，需对以上链式做进一步扩展。<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\sum_{k=0}^3 \frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial s_k}\frac{\partial s_k}{\partial W}" style="border:none"></p>
 <p>以下代码对BPTT做简单的实现：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">bptt</span><span class="params">(self, x, y)</span>:</span></div><div class="line">    T = len(y)</div><div class="line">    <span class="comment"># Perform forward propagation</span></div><div class="line">    o, s = self.forward_propagation(x)</div><div class="line">    <span class="comment"># We accumulate the gradients in these variables</span></div><div class="line">    dLdU = np.zeros(self.U.shape)</div><div class="line">    dLdV = np.zeros(self.V.shape)</div><div class="line">    dLdW = np.zeros(self.W.shape)</div><div class="line">    delta_o = o</div><div class="line">    delta_o[np.arange(len(y)), y] -= <span class="number">1.</span></div><div class="line">    <span class="comment"># For each output backwards...</span></div><div class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> np.arange(T)[::<span class="number">-1</span>]:</div><div class="line">        dLdV += np.outer(delta_o[t], s[t].T)</div><div class="line">        <span class="comment"># Initial delta calculation: dL/dz</span></div><div class="line">        delta_t = self.V.T.dot(delta_o[t]) * (<span class="number">1</span> - (s[t] ** <span class="number">2</span>))</div><div class="line">        <span class="comment"># Backpropagation through time (for at most self.bptt_truncate steps)</span></div><div class="line">        <span class="keyword">for</span> bptt_step <span class="keyword">in</span> np.arange(max(<span class="number">0</span>, t-self.bptt_truncate), t+<span class="number">1</span>)[::<span class="number">-1</span>]:</div><div class="line">            <span class="comment"># print "Backpropagation step t=%d bptt step=%d " % (t, bptt_step)</span></div><div class="line">            <span class="comment"># Add to gradients at each previous step</span></div><div class="line">            dLdW += np.outer(delta_t, s[bptt_step<span class="number">-1</span>])              </div><div class="line">            dLdU[:,x[bptt_step]] += delta_t</div><div class="line">            <span class="comment"># Update delta for next step dL/dz at t-1</span></div><div class="line">            delta_t = self.W.T.dot(delta_t) * (<span class="number">1</span> - s[bptt_step<span class="number">-1</span>] ** <span class="number">2</span>)</div><div class="line">    <span class="keyword">return</span> [dLdU, dLdV, dLdW]</div></pre></td></tr></table></figure></p>
 <p>通过以上例子，或许你会发现RNN难以训练的一个原因：当序列过长，比如包含有20多个单词的长句，此时误差回传（back-propagate）时会经过很多layer。因而在实际中，人们往往将回传长度截剩下几个step。</p>
-<h1 id="存在问题（梯度消失与膨胀）"><a href="#存在问题（梯度消失与膨胀）" class="headerlink" title="存在问题（梯度消失与膨胀）"></a>存在问题（梯度消失与膨胀）</h1><p><a href="http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/" target="_blank" rel="external">先前提到</a>RNN对具有以下特点的句子有点无力：隔着几个step的单词（比如第1个词与第4个词）之间关联性低（原文说法：RNNs have difficulties learning long-range dependencies – interactions between words that are several steps apart）。而英语中尽是这样的句子，所以这个问题十分严重。比如“The man who wore a wig on his head went inside”，该句讲的是man进屋，但RNN则可能认为是wig。本部分介绍出现该问题的原因。上部分提到了梯度回传的式子：</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\sum_{k=0}^3 \frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial s_k}\frac{\partial s_k}{\partial W}" style="border:none"></p>
-<p>首先，注意到s_3对前个step的状态s_k的偏导数，也可以应用链式法则拆开，例如</p>
-<p><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial s_3}{\partial s_1}=\frac{\partial s_3}{\partial s_2}\frac{\partial s_2}{\partial s_1}" style="border:none"></p>
-<p>其次，我们是对向量求另一向量的偏导数，其结果是一个雅可比矩阵（Jacobian matrix）。因而，式子可写为：</p>
-<p><img src="http://latex.codecogs.com/gif.latex? 
+<h1 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h1><h2 id="梯度消失（The-Vanishing-Gradient-Problem）"><a href="#梯度消失（The-Vanishing-Gradient-Problem）" class="headerlink" title="梯度消失（The Vanishing Gradient Problem）"></a>梯度消失（The Vanishing Gradient Problem）</h2><p><a href="http://www.wildml.com/2015/09/recurrent-neural-networks-tutorial-part-1-introduction-to-rnns/" target="_blank" rel="external">先前提到</a>RNN对具有以下特点的句子有点无力：隔着几个step的单词（比如第1个词与第4个词）之间关联性低（原文说法：RNNs have difficulties learning long-range dependencies – interactions between words that are several steps apart）。而英语中尽是这样的句子，所以这个问题十分严重。比如“The man who wore a wig on his head went inside”，该句讲的是man进屋，但RNN则可能认为是wig。本部分介绍出现该问题的原因。上部分提到了梯度回传的式子：<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial E_3}{\partial W}=\sum_{k=0}^3 \frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial s_3}\frac{\partial s_3}{\partial s_k}\frac{\partial s_k}{\partial W}" style="border:none"></p>
+<p>首先，注意到s_3对前个step的状态s_k的偏导数，也可以应用链式法则拆开，例如<br><img src="https://chart.googleapis.com/chart?cht=tx&chl= \frac{\partial s_3}{\partial s_1}=\frac{\partial s_3}{\partial s_2}\frac{\partial s_2}{\partial s_1}" style="border:none"></p>
+<p>其次，我们是对向量求另一向量的偏导数，其结果是一个雅可比矩阵（Jacobian matrix）。因而，式子可写为：<br><img src="http://latex.codecogs.com/gif.latex? 
 \frac{\partial E_3}{\partial W}=
 \sum_{k=0}^3 \frac{\partial E_3}{\partial \hat{y}_3}
 \frac{\partial \hat{y}_3}{\partial s_3}
 ( \prod_{j=k+1}^3 \frac{\partial s_j}{\partial s_{j-1}} )
 \frac{\partial s_k}{\partial W}" style="border:none"></p>
-<p>写到这，明天继续<br><img src="http://nn.readthedocs.io/en/rtd/image/tanh.png" class="img-shadow"></p>
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>想到了再写。</p>
+<p>显然，上面式子的雅可比矩阵的2范式(<a href="https://en.wiktionary.org/wiki/two-norm" target="_blank" rel="external">two-norm</a>)（也可以视为一个绝对值），其上限值为1。关于这点可以从下图直观看出。图中描绘的是tanh函数以及对应的导数，当然，sigmoid函数的曲线和tanh一样，只不过把上限缩为1/4。</p>
+<p><img src="http://nn.readthedocs.io/en/rtd/image/tanh.png" class="img-shadow"></p>
+<p>梯度消失的原因发生在此处。从上图可知，微分函数曲线的首位两端为0，且基本趋近于直线。倘若训练过程中达到这个状态，我们称神经元的响应达到饱和（saturated），此时神经元梯度为0，并将这个值一直回传给上个step。若矩阵的值比较小，经过几次叠乘后，将剧烈地衰减，经过几个time step后，梯度将趋向于0。梯度增益在传到“远在天边”的起点step时已经成0，然而中间经过的那些step的状态State对模型的训练没有多大意义。当然，梯度消失的现象并非RNN独有，在一些深层的前馈神经网络（Feedforward Neural Networks）中，也时常出现。由于大多数应用中，RNN需要处理长度深的句子，因而问题显得更为常见。</p>
+<h2 id="梯度膨胀（The-Exploding-Gradient-Problem）"><a href="#梯度膨胀（The-Exploding-Gradient-Problem）" class="headerlink" title="梯度膨胀（The Exploding Gradient Problem）"></a>梯度膨胀（The Exploding Gradient Problem）</h2><p>其实可以很容易想到，梯度值取决于激活函数以及网络参数，当雅可比行列式的值过大，经过叠乘后将造成梯度值膨胀，也称“梯度膨胀”。不过，与前者相比，该问题的关注程度则要低很多，其原因有二：一方面，过大的梯度在程序里会变成NaN值，中断程序运行；另一方面，该问题其实只需用</p>
+<h2 id="应对之策"><a href="#应对之策" class="headerlink" title="应对之策"></a>应对之策</h2><p>幸运的是，目前针对梯度消失问题已有一些较好的方法：合适的初始化权重W、或是数据正则化（regularization）均能有效降低Vanishing Gradient；另一方面，采用<a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks" target="_blank" rel="external">ReLU</a>)激活函数来代替tanh或sigmoid也是相当常用，ReLU的微分是常数0或1，因而不太可能造成vanishing；而最为常用的一种方法是修改RNN单元的结构，采用Long Short-Term Memory (LSTM) 或 Gated Recurrent Unit (GRU)结构。LSTMs最早在1997年提出，或许是迄今NLP领域最受欢迎的结构，而GRU在2014年提出，可视为一种简化版的LSTMs，两种方法均能有效解决梯度消失问题，并在长序列样本中表现良好。</p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>文章基本上翻译完了，其他想到了再写。</p>
 
       
     </div>
@@ -417,6 +411,8 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
           
             <a href="/tags/RNN/" rel="tag"># RNN</a>
           
+            <a href="/tags/translation/" rel="tag"># translation</a>
+          
         </div>
       
 
@@ -433,6 +429,10 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/31/（译）训练rnn的困难之处/" rel="prev" title="（译）训练rnn的困难之处">
+                （译）训练rnn的困难之处 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -502,7 +502,7 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -513,7 +513,7 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -568,7 +568,7 @@ RNNRNN简介RNN(Recurrent Neural Networks)的一个核心思想是将样本的�
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">2.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN简介"><span class="nav-number">2.1.</span> <span class="nav-text">RNN简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN结构"><span class="nav-number">2.2.</span> <span class="nav-text">RNN结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一点补充"><span class="nav-number">2.3.</span> <span class="nav-text">一点补充</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反向传播"><span class="nav-number">3.</span> <span class="nav-text">反向传播</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差累加"><span class="nav-number">3.1.</span> <span class="nav-text">误差累加</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些推导"><span class="nav-number">3.2.</span> <span class="nav-text">一些推导</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#存在问题（梯度消失与膨胀）"><span class="nav-number">4.</span> <span class="nav-text">存在问题（梯度消失与膨胀）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RNN"><span class="nav-number">2.</span> <span class="nav-text">RNN</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN简介"><span class="nav-number">2.1.</span> <span class="nav-text">RNN简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN结构"><span class="nav-number">2.2.</span> <span class="nav-text">RNN结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一点补充"><span class="nav-number">2.3.</span> <span class="nav-text">一点补充</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反向传播"><span class="nav-number">3.</span> <span class="nav-text">反向传播</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#误差累加"><span class="nav-number">3.1.</span> <span class="nav-text">误差累加</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些推导"><span class="nav-number">3.2.</span> <span class="nav-text">一些推导</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#存在问题"><span class="nav-number">4.</span> <span class="nav-text">存在问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度消失（The-Vanishing-Gradient-Problem）"><span class="nav-number">4.1.</span> <span class="nav-text">梯度消失（The Vanishing Gradient Problem）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度膨胀（The-Exploding-Gradient-Problem）"><span class="nav-number">4.2.</span> <span class="nav-text">梯度膨胀（The Exploding Gradient Problem）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应对之策"><span class="nav-number">4.3.</span> <span class="nav-text">应对之策</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
             
 
           </div>

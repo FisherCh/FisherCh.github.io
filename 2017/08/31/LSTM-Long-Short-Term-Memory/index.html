@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="RNN,translation," />
 
 
 
@@ -84,15 +84,18 @@
 
 
 
-<meta name="description" content="The author is too lazy to write anything.">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Heterodoxy">
-<meta property="og:url" content="FisherCh.github.io/tags/Testing/index.html">
+<meta name="description" content="Introduction前文BPTT中介绍RNN的梯度回传以及存在问题，提到LSTM能有效解决训练长序列时的梯度消失，在本文中，将尝试推导LSTM的回传过程（压力有点大）。本文对LSTM的理解主要来自Understanding LSTM Networks与Implementing a GRU/LSTM RNN with Python and Theano，前者对LSTM进行了细致的讲解，后者则另外">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LSTM (Long Short Term Memory)">
+<meta property="og:url" content="FisherCh.github.io/2017/08/31/LSTM-Long-Short-Term-Memory/index.html">
 <meta property="og:site_name" content="Heterodoxy">
-<meta property="og:description" content="The author is too lazy to write anything.">
+<meta property="og:description" content="Introduction前文BPTT中介绍RNN的梯度回传以及存在问题，提到LSTM能有效解决训练长序列时的梯度消失，在本文中，将尝试推导LSTM的回传过程（压力有点大）。本文对LSTM的理解主要来自Understanding LSTM Networks与Implementing a GRU/LSTM RNN with Python and Theano，前者对LSTM进行了细致的讲解，后者则另外">
+<meta property="og:image" content="http://img.blog.csdn.net/20170228165331300?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
+<meta property="og:updated_time" content="2017-08-31T12:54:40.250Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Heterodoxy">
-<meta name="twitter:description" content="The author is too lazy to write anything.">
+<meta name="twitter:title" content="LSTM (Long Short Term Memory)">
+<meta name="twitter:description" content="Introduction前文BPTT中介绍RNN的梯度回传以及存在问题，提到LSTM能有效解决训练长序列时的梯度消失，在本文中，将尝试推导LSTM的回传过程（压力有点大）。本文对LSTM的理解主要来自Understanding LSTM Networks与Implementing a GRU/LSTM RNN with Python and Theano，前者对LSTM进行了细致的讲解，后者则另外">
+<meta name="twitter:image" content="http://img.blog.csdn.net/20170228165331300?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast">
 
 
 
@@ -120,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="FisherCh.github.io/tags/Testing/"/>
+  <link rel="canonical" href="FisherCh.github.io/2017/08/31/LSTM-Long-Short-Term-Memory/"/>
 
 
 
 
 
-  <title> 标签: Testing | Heterodoxy </title>
+  <title> LSTM (Long Short Term Memory) | Heterodoxy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -147,7 +150,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -239,46 +242,155 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        Testing
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="FisherCh.github.io/2017/08/31/LSTM-Long-Short-Term-Memory/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Fisher Chen">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/img/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Heterodoxy">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Heterodoxy" src="">
+    </span>
+  </span>
 
     
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                LSTM (Long Short Term Memory)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-31T20:23:27+08:00">
+                2017-08-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p>前文<a href="">BPTT</a>中介绍RNN的梯度回传以及存在问题，提到LSTM能有效解决训练长序列时的梯度消失，在本文中，将尝试推导LSTM的回传过程（压力有点大）。本文对LSTM的理解主要来自<a href="http://blog.csdn.net/jerr__y/article/details/58598296" target="_blank" rel="external">Understanding LSTM Networks</a>与<a href="http://www.wildml.com/2015/10/recurrent-neural-network-tutorial-part-4-implementing-a-grulstm-rnn-with-python-and-theano/" target="_blank" rel="external">Implementing a GRU/LSTM RNN with Python and Theano</a>，前者对LSTM进行了细致的讲解，后者则另外对比了LSTM与GRU，请不明白的读者自行查看，本文不再赘述（其实怕讲不好）。</p>
+<p>LSTM单元的结构如下图所示：</p>
+<p><img src="http://img.blog.csdn.net/20170228165331300?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvSmVycl9feQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" class="img-shadow"></p>
+<p>图中，</p>
+<p># </p>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2017/05/27/The-Research-Of-Licence-Plate-Recognition/" itemprop="url">
-              
-                <span itemprop="name">The Research Of Licence Plate Recognition</span>
-              
-            </a>
+
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-05-27T18:33:04+08:00"
-              content="2017-05-27" >
-          05-27
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/RNN/" rel="tag"># RNN</a>
+          
+            <a href="/tags/translation/" rel="tag"># translation</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/31/（译）训练rnn的困难之处/" rel="next" title="（译）训练rnn的困难之处">
+                <i class="fa fa-chevron-left"></i> （译）训练rnn的困难之处
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
           
           </div>
@@ -286,6 +398,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -305,8 +421,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/img/avatar.png"
@@ -375,6 +500,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
     </div>
@@ -474,6 +615,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
 
   
 
@@ -505,6 +650,10 @@
 
   
 
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
   
 
 

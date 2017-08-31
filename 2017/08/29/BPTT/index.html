@@ -132,7 +132,7 @@ E_t=-\sum_{i} y_i\log( \hat{y}_i )">
 ( \prod_{j=k+1}^3 \frac{\partial s_j}{\partial s_{j-1}} )
 \frac{\partial s_k}{\partial W}">
 <meta property="og:image" content="http://nn.readthedocs.io/en/rtd/image/tanh.png">
-<meta property="og:updated_time" content="2017-08-31T09:27:42.727Z">
+<meta property="og:updated_time" content="2017-08-31T09:39:10.287Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BPTT(Backpropagation Through Time)">
 <meta name="twitter:description" content="简介本文介绍RNN中反向传播的原理，主要内容来自对Backpropagation Through Time and Vanishing Gradients的翻译与理解。关于RNN与LSTM的原理以及介绍，个人推荐（译）理解 LSTM 网络。
@@ -384,7 +384,7 @@ E_t=-\sum_{i} y_i\log( \hat{y}_i )" style="border:none"></p>
 <p>对分类器的误差衡量一般采用交叉熵损失函数，定义如下，其中$y_t$为已知的标签。式子表示对每一个时刻i（可理解为单词）的误差$-y_i\log(\hat{y_i})$进行累加，作为一个样本（整个句子）的误差。</p>
 <p>。。。</p>
 <h2 id="一点补充"><a href="#一点补充" class="headerlink" title="一点补充"></a>一点补充</h2><p>。。。</p>
-<h1 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h1><h2 id="误差累加"><a href="#误差累加" class="headerlink" title="误差累加"></a>误差累加</h2><p>这里RNN权重W的更新和BP神经网络类似，都是求误差对权重的梯度。而有少许不同的是，RNN中首先求每一个t的误差$E<em>t$对权重$W$的偏导数，再将结果叠加，成为一个样本对权重的误差梯度。<br>&lt;img src=”<a href="http://latex.codecogs.com/gif.latex?" target="_blank" rel="external">http://latex.codecogs.com/gif.latex?</a><br>\frac{\partial E}{\partial W}=\sum</em>{t}\frac{\partial E_t}{\partial W}”<br>style=”border:none”&gt;</p>
+<h1 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h1><h2 id="误差累加"><a href="#误差累加" class="headerlink" title="误差累加"></a>误差累加</h2><p>这里RNN权重W的更新和BP神经网络类似，都是求误差对权重的梯度。而有少许不同的是，RNN中首先求每一个t的误差$E<em>t$对权重$W$的偏导数，再将结果叠加，成为一个样本对权重的误差梯度。<br>&lt;img src=”<a href="http://latex.codecogs.com/gif.latex?" target="_blank" rel="external">http://latex.codecogs.com/gif.latex?</a><br>\frac{\partial E}{\partial W}=\sum</em>{t}<br>\frac{\partial E_t}{\partial W}” style=”border:none”&gt;</p>
 <p>RNN中的每一个节点（或是说time step）共用一个矩阵$W$，因而每一处的误差$E_t$都反映了权重$W$是否正确，所以在更新时对每个time step的误差做了累加操作。</p>
 <p><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2015/10/rnn-bptt-with-gradients.png" class="img-shadow"></p>
 <h2 id="一些推导"><a href="#一些推导" class="headerlink" title="一些推导"></a>一些推导</h2><p>现以中间的一个time step为例进行计算。在计算梯度时引入了微分的链式规则，设t=3，那么有<br><img src="http://latex.codecogs.com/gif.latex? \frac{\partial E_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial V}=\frac{\partial E_3}{\partial \hat{y}_3}\frac{\partial \hat{y}_3}{\partial z_3}\frac{\partial z_3}{\partial V}=(\hat{y}_3-y_3)\otimes s_3" style="border:none"><br><img src="https://chart.googleapis.com/chart?cht=tx&chl= z_3=V \ast s_3" style="border:none"><br>其中，$\otimes$表示两个向量的外积（叉乘）。在这里，原作者推导上式只为说明误差E对V的偏导仅仅与当前的time step有关，因而可以通过简单的矩阵运算求得。</p>
@@ -422,7 +422,7 @@ E_t=-\sum_{i} y_i\log( \hat{y}_i )" style="border:none"></p>
 <p><img src="http://nn.readthedocs.io/en/rtd/image/tanh.png" class="img-shadow"></p>
 <p>梯度消失的原因发生在此处。从上图可知，微分函数曲线的首位两端为0，且基本趋近于直线。倘若训练过程中达到这个状态，我们称神经元的响应达到饱和（saturated），此时神经元梯度为0，并将这个值一直回传给上个step。若矩阵的值比较小，经过几次叠乘后，将剧烈地衰减，经过几个time step后，梯度将趋向于0。梯度增益在传到“远在天边”的起点step时已经成0，然而中间经过的那些step的状态State对模型的训练没有多大意义。当然，梯度消失的现象并非RNN独有，在一些深层的前馈神经网络（Feedforward Neural Networks）中，也时常出现。由于大多数应用中，RNN需要处理长度深的句子，因而问题显得更为常见。</p>
 <h2 id="梯度膨胀（The-Exploding-Gradient-Problem）"><a href="#梯度膨胀（The-Exploding-Gradient-Problem）" class="headerlink" title="梯度膨胀（The Exploding Gradient Problem）"></a>梯度膨胀（The Exploding Gradient Problem）</h2><p>其实可以很容易想到，梯度值取决于激活函数以及网络参数，当雅可比行列式的值过大，经过叠乘后将造成梯度值膨胀，也称“梯度膨胀”。不过，与前者相比，该问题的关注程度则要低很多，其原因有二：一方面，过大的梯度在程序里会变成NaN值，中断程序运行；另一方面，该问题其实只需用</p>
-<h2 id="应对之策"><a href="#应对之策" class="headerlink" title="应对之策"></a>应对之策</h2><p>幸运的是，目前针对梯度消失问题已有一些较好的方法：合适的初始化权重W、或是数据正则化（regularization）均能有效降低Vanishing Gradient；另一方面，采用<a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks" target="_blank" rel="external">ReLU</a>)激活函数来代替tanh或sigmoid也是相当常用，ReLU的微分是常数0或1，因而不太可能造成vanishing；而最为常用的一种方法是修改RNN单元的结构，采用Long Short-Term Memory (LSTM) 或 Gated Recurrent Unit (GRU)结构。LSTMs最早在1997年提出，或许是迄今NLP领域最受欢迎的结构，而GRU在2014年提出，可视为一种简化版的LSTMs，两种方法均能有效解决梯度消失问题，并在长序列样本中表现良好。</p>
+<h2 id="应对之策"><a href="#应对之策" class="headerlink" title="应对之策"></a>应对之策</h2><p>幸运的是，目前针对梯度消失问题已有一些较好的方法：合适的初始化权重W、或是数据正则化（regularization）均能有效降低Vanishing Gradient；另一方面，采用<a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks" target="_blank" rel="external">ReLU</a>)激活函数来代替tanh或sigmoid也是相当常用，ReLU的微分是常数0或1，因而不太可能造成vanishing；而最为常用的一种方法是修改RNN单元的结构，采用Long Short-Term Memory (LSTM) 或 Gated Recurrent Unit (GRU)结构。LSTMs最早在1997年提出，或许是迄今NLP领域最受欢迎的结构，而GRU在<a href="https://arxiv.org/pdf/1406.1078v3.pdf" target="_blank" rel="external">2014年提出</a>，可视为一种简化版的LSTMs，两种方法均能有效解决梯度消失问题，并在长序列样本中表现良好。</p>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>文章基本上翻译完了，其他想到了再写。</p>
 
       
@@ -542,7 +542,7 @@ E_t=-\sum_{i} y_i\log( \hat{y}_i )" style="border:none"></p>
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

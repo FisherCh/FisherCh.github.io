@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="translation,vae," />
+  <meta name="keywords" content="vae,translation," />
 
 
 
@@ -95,7 +95,7 @@
 
 前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
 <meta property="og:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
-<meta property="og:updated_time" content="2018-04-09T14:18:49.002Z">
+<meta property="og:updated_time" content="2018-04-09T14:34:15.458Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="（译）Understanding the Variational Lower Bound">
 <meta name="twitter:description" content="原文链接
@@ -347,8 +347,7 @@
 <p>进一步令<br>$$<br>L= \mathbb{E}_q [ \log p(X,Z) ] + H(Z),<br>$$<br>显然$L$是观察数据的log概率的下界。因而，如果想最大化数据的边缘概率，可转化为最大化这个下界$L$。</p>
 <h3 id="2-3-KL散度"><a href="#2-3-KL散度" class="headerlink" title="2.3 KL散度"></a>2.3 KL散度</h3><p>在最后一节，我们不会将重点过多放在分布$p(Z)$。然而，关于$p(Z)$这个分布的讨论实际上是系列VB方法的核心。多数情况下，后验分布$p(Z|X)$的计算常常难以进行。例如，在求分母时就需要对所有情况的隐变量求积分（或求和）。</p>
 <p>变分方法背后的主要思路是：找一个与真实后验分布$p(Z|X)$尽可能相近的分布$q(Z)$来近似代替。这些近似的分布可以有自己的变分参数$q(Z| \theta)$，而我们要做的就是通过设置参数来让$q$靠近其后验。显然，应当要求这些分布$q(Z)$形式简单且更加易于推断。</p>
-<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：<br>$$<br>\begin{aligned}<br>KL[ q(Z) || p(Z|X) ]<br>&amp;= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \<br>&amp;= -\int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \<br>&amp;= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} -<br>                  \int_Z q(Z) \log p(X)   \right)  \quad(8) \<br>&amp;= -  \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  +<br>                  \log p(X) \int_Z q(Z)  \quad(9) \<br>&amp;= -L +\log p(X) \qquad(10)</p>
-<p>\end{aligned}<br>$$</p>
+<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：<br>$$<br>\begin{aligned}<br>KL[ q(Z) || p(Z|X) ]<br>&amp;= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \<br>&amp;= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} - \int_Z q(Z) \log p(X) \right)  \quad(8) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  + \log p(X) \int_Z q(Z)  \quad(9) \<br>&amp;= -L +\log p(X) \qquad(10)<br>\end{aligned}<br>$$</p>
 <p>其中$L$是上文提到的变分下界。式子（10）由$\int_Z q(Z)=1$代入得到。移项可得：<br>$$<br>L=\log p(X) - KL[ q(Z) || p(Z|X) ].<br>$$<br>由于KL散度恒大于0，再一次得到$L \leq \log p(X)$是观察数据log概率的一个下界。并且可得知二者的差为近似与真实分布间的KL散度。换句话说，当近似的分布与真实分布完全重合（perfectly closed），下界$L$等于log概率。</p>
 <h2 id="3-举例"><a href="#3-举例" class="headerlink" title="3 举例"></a>3 举例</h2><h3 id="3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><a href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）" class="headerlink" title="3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）"></a>3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</h3><p>现在，我们可凭借对变分下界的理解来推断实际问题的学习规则。本文以论文（<a href="https://arxiv.org/abs/1412.7755" target="_blank" rel="external">Ba et al., 2014</a>）为例。</p>
 <p>首先，我们需要最大化分类标签的log似然：$\log p(y | I, W)$。此处$I$为输入图像，$W$是模型参数，而$y$是类别的标签，也是我们可以视为观测数据的变量。之后，依据对位置$l$（隐变量）的边缘化，目标函数的形式可以变为：<br>$$<br>\log p(y | I, W) = \log \sum_l p(l | I,W)p(y | l, I ,W)<br>$$<br>通过Jensen不等式可直接得到下界：<br>$$<br>\log \sum_l p(l | I,W)p(y | l, I ,W)<br> \geq<br> \sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>当然，通过观察数据边缘分布的变分下界，假定$q(l)=p(l| I,W)$，也可得到相同的结果：<br>$$<br>\log p(y|I,W) \geq<br>\sum_l q(l) \log \frac{p(y,l |I,W)}{q(l)} =<br>\sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>之后，可以根据这变分下界对模型参数$W$求导，来最大化这个下界。论文（<a href="https://arxiv.org/abs/1502.03044" target="_blank" rel="external">Xu et al., 2015</a>）中也采用了几乎相同的求导策略。</p>
@@ -376,9 +375,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/translation/" rel="tag"># translation</a>
-          
             <a href="/tags/vae/" rel="tag"># vae</a>
+          
+            <a href="/tags/translation/" rel="tag"># translation</a>
           
         </div>
       

@@ -1,0 +1,696 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="translation,vae," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="原文链接
+
+前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
+<meta property="og:type" content="article">
+<meta property="og:title" content="（译）Understanding the Variational Lower Bound">
+<meta property="og:url" content="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/index.html">
+<meta property="og:site_name" content="Heterodoxy">
+<meta property="og:description" content="原文链接
+
+前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
+<meta property="og:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
+<meta property="og:updated_time" content="2018-04-09T13:54:19.939Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="（译）Understanding the Variational Lower Bound">
+<meta name="twitter:description" content="原文链接
+
+前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
+<meta name="twitter:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/"/>
+
+
+
+
+
+  <title> （译）Understanding the Variational Lower Bound | Heterodoxy </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Heterodoxy</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle"></p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Fisher Chen">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/img/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Heterodoxy">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Heterodoxy" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                （译）Understanding the Variational Lower Bound
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T21:45:52+08:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <ul>
+<li><a href="http://legacydirs.umiacs.umd.edu/~xyang35/files/understanding-variational-lower.pdf" target="_blank" rel="external">原文链接</a></li>
+</ul>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力”机制有关的论文中对学习规则的推导。</p>
+<h2 id="2-变分下界"><a href="#2-变分下界" class="headerlink" title="2 变分下界"></a>2 变分下界</h2><h3 id="2-1-问题提出"><a href="#2-1-问题提出" class="headerlink" title="2.1 问题提出"></a>2.1 问题提出</h3><p>假设$X$是观察数据，而$Z$是潜在的变量。请注意，一般情况下，隐变量可能包含参数。（原文： Note that we are general – the hidden variables might include the “parameters”.）这两个变量的关系可用以下的图模型表示（figure 1）。</p>
+<div align="center"><br><img src="/img/translation_2/translate_fig_1.jpg" width="80%" class="img-shadow"><br></div>
+
+<p>更进一步，令大写$P(X)$表示该变量的概率分布，小写$p(X)$表示变量X的概率密度函数。根据贝叶斯理论，隐变量的后验分布可表示为：<br>$$<br>p(Z|X)=\frac{ p(X|Z) p(Z) }{ p(X) } = \frac{p(X|Z) p(Z)}{ \int_Z p(X,Z) }<br>$$</p>
+<h3 id="2-2-Jensen不等式"><a href="#2-2-Jensen不等式" class="headerlink" title="2.2 Jensen不等式"></a>2.2 Jensen不等式</h3><p>我们从log概率出发进行观察（$X$的边缘分布），可得到：<br>$$<br>\begin{aligned}<br>\log p(X)<br>&amp;= \log \int_Z p(X,Z)    \qquad(1) \<br>&amp;=\log \int_Z p(X,Z)  \frac{q(Z)}{q(Z)} \quad(2)\<br>&amp;=\log \left (  \mathbb{E}_q \left [  \frac{p(X,Z)}{ q(Z) } \right ]  \right ) \quad(3)\<br>&amp;\geq \mathbb{E}_q \left [ \log \frac{ p(X,Z) }{ q(Z) } \right ]  \qquad(4)\<br>&amp;= \mathbb{E}_q [ \log p(X,Z) ] + H(Z) \qquad(5)<br>\end{aligned}<br>$$</p>
+<p>其中，式子（5）即为变分下界，或称为ELBO。</p>
+<p>式子（2）中的分布$q(Z)$是用来近似替代VB中真实后验分布$p(Z|X)$。在此处。。。。式子（4）将Jensen不等式（$ f( \mathbb{E}[X] )  \leq \mathbb{E}[ f(X) ]$）套在凸对数函数上。$H(Z)=- \mathbb{E} \left( \log_q (Z) \right)$表示香农熵。</p>
+<p>进一步令<br>$$<br>L= \mathbb{E}_q [ \log p(X,Z) ] + H(Z),<br>$$<br>显然$L$是观察数据的log概率的下界。因而，如果想最大化数据的边缘概率，可转化为最大化这个下界$L$。</p>
+<h3 id="2-3-KL散度"><a href="#2-3-KL散度" class="headerlink" title="2.3 KL散度"></a>2.3 KL散度</h3><p>在最后一节，我们不会将重点过多放在分布$p(Z)$。然而，关于$p(Z)$这个分布的讨论实际上是系列VB方法的核心。多数情况下，后验分布$p(Z|X)$的计算常常难以进行。例如，在求分母时就需要对所有情况的隐变量求积分（或求和）。</p>
+<p>变分方法背后的主要思路是：找一个与真实后验分布$p(Z|X)$尽可能相近的分布$q(Z)$来近似代替。这些近似的分布可以有自己的变分参数$q(Z| \theta)$，而我们要做的就是通过设置参数来让$q$靠近其后验。显然，应当要求这些分布$q(Z)$形式简单且更加易于推断。</p>
+<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：<br>$$<br>\begin{aligned}<br>KL[ q(Z) || p(Z|X) ]<br>&amp;= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \<br>&amp;= -\int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \<br>&amp;= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} -<br>                  \int_Z q(Z) \log p(X)   \right)  \quad(8) \<br>&amp;= -  \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  +<br>                  \log p(X) \int_Z q(Z)  \quad(9) \<br>&amp;= -L +\log p(X) \qquad(10)</p>
+<p>\end{aligned}<br>$$</p>
+<p>其中$L$是上文提到的变分下界。式子（10）由$\int_Z q(Z)=1$代入得到。移项可得：<br>$$<br>L=\log p(X) - KL[ q(Z) || p(Z|X) ].<br>$$<br>由于KL散度恒大于0，再一次得到$L \leq \log p(X)$是观察数据log概率的一个下界。并且可得知二者的差为近似与真实分布间的KL散度。换句话说，当近似的分布与真实分布完全重合（perfectly closed），下界$L$等于log概率。</p>
+<h2 id="3-举例"><a href="#3-举例" class="headerlink" title="3 举例"></a>3 举例</h2><h3 id="3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><a href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）" class="headerlink" title="3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）"></a>3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</h3><p>现在，我们可凭借对变分下界的理解来推断实际问题的学习规则。本文以论文（<a href="https://arxiv.org/abs/1412.7755" target="_blank" rel="external">Ba et al., 2014</a>）为例。</p>
+<p>首先，我们需要最大化分类标签的log似然：$\log p(y | I, W)$。此处$I$为输入图像，$W$是模型参数，而$y$是类别的标签，也是我们可以视为观测数据的变量。之后，依据对位置$l$（隐变量）的边缘化，目标函数的形式可以变为：<br>$$<br>\log p(y | I, W) = \log \sum_l p(l | I,W)p(y | l, I ,W)<br>$$<br>通过Jensen不等式可直接得到下界：<br>$$<br>\log \sum_l p(l | I,W)p(y | l, I ,W)<br> \geq<br> \sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>当然，通过观察数据边缘分布的变分下界，假定$q(l)=p(l| I,W)$，也可得到相同的结果：<br>$$<br>\log p(y|I,W) \geq<br>\sum_l q(l) \log \frac{p(y,l |I,W)}{q(l)} =<br>\sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>之后，可以根据这变分下界对模型参数$W$求导，来最大化这个下界。论文（<a href="https://arxiv.org/abs/1502.03044" target="_blank" rel="external">Xu et al., 2015</a>）中也采用了几乎相同的求导策略。</p>
+<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4 总结"></a>4 总结</h2><p>本文介绍了什么是变分下界以及其在VB方法的地位。本文通过两种不同的方法推导变分下界，并提供它与其他实体关系的清晰思路。本文还通过一个具体的例子展示了如何使用变分下界来获得实用的学习规则，这对理解相关论文非常有用。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/translation/" rel="tag"># translation</a>
+          
+            <a href="/tags/vae/" rel="tag"># vae</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/04/learn-pytorch-01/" rel="next" title="learn pytorch(1)">
+                <i class="fa fa-chevron-left"></i> learn pytorch(1)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/img/avatar.png"
+               alt="Fisher Chen" />
+          <p class="site-author-name" itemprop="name">Fisher Chen</p>
+          <p class="site-description motion-element" itemprop="description">The author is too lazy to write anything.</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/FisherCh" target="_blank" title="Git">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  Git
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/FisherCh" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-变分下界"><span class="nav-number">2.</span> <span class="nav-text">2 变分下界</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-问题提出"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 问题提出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Jensen不等式"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Jensen不等式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-KL散度"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 KL散度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-举例"><span class="nav-number">3.</span> <span class="nav-text">3 举例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-总结"><span class="nav-number">4.</span> <span class="nav-text">4 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Fisher Chen</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+      <!-- UY BEGIN -->
+      <script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid="></script>
+      <!-- UY END -->
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

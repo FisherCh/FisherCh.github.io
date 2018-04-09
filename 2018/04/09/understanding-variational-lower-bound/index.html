@@ -95,7 +95,7 @@
 
 前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
 <meta property="og:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
-<meta property="og:updated_time" content="2018-04-09T13:54:19.939Z">
+<meta property="og:updated_time" content="2018-04-09T14:18:49.002Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="（译）Understanding the Variational Lower Bound">
 <meta name="twitter:description" content="原文链接
@@ -684,6 +684,28 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
 
   
 

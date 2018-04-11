@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="translation,vae," />
+  <meta name="keywords" content="style-transfer,reading," />
 
 
 
@@ -84,24 +84,29 @@
 
 
 
-<meta name="description" content="原文链接
+<meta name="description" content="1 简介用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。
+2 内容2.1 基本结构文章提出了两种风格转换的模型，但其根本在于如何提取出不含“风格”的内容变量。模型需要一个判别器来断定是否含有“风格”因素，文章借助GAN的结构，采取一种讨巧的思路：用判别器对文本特征进行风格归类，当判别器失效，可认为当前特征不含风格信息。
 
-前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
+文中的GAN包含以下两个部分：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="（译）Understanding the Variational Lower Bound">
-<meta property="og:url" content="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/index.html">
+<meta property="og:title" content="论文解读《Style Transfer in Text：Exploration and Evaluation》">
+<meta property="og:url" content="FisherCh.github.io/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/index.html">
 <meta property="og:site_name" content="Heterodoxy">
-<meta property="og:description" content="原文链接
+<meta property="og:description" content="1 简介用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。
+2 内容2.1 基本结构文章提出了两种风格转换的模型，但其根本在于如何提取出不含“风格”的内容变量。模型需要一个判别器来断定是否含有“风格”因素，文章借助GAN的结构，采取一种讨巧的思路：用判别器对文本特征进行风格归类，当判别器失效，可认为当前特征不含风格信息。
 
-前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
-<meta property="og:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
-<meta property="og:updated_time" content="2018-04-09T14:34:15.458Z">
+文中的GAN包含以下两个部分：">
+<meta property="og:image" content="FisherCh.github.io/paper_style_1/model.jpg">
+<meta property="og:image" content="FisherCh.github.io/paper_style_1/model_result.jpg">
+<meta property="og:image" content="FisherCh.github.io/paper_style_1/model_result2.jpg">
+<meta property="og:updated_time" content="2018-04-11T14:15:18.042Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="（译）Understanding the Variational Lower Bound">
-<meta name="twitter:description" content="原文链接
+<meta name="twitter:title" content="论文解读《Style Transfer in Text：Exploration and Evaluation》">
+<meta name="twitter:description" content="1 简介用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。
+2 内容2.1 基本结构文章提出了两种风格转换的模型，但其根本在于如何提取出不含“风格”的内容变量。模型需要一个判别器来断定是否含有“风格”因素，文章借助GAN的结构，采取一种讨巧的思路：用判别器对文本特征进行风格归类，当判别器失效，可认为当前特征不含风格信息。
 
-前言变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力">
-<meta name="twitter:image" content="FisherCh.github.io/img/translation_2/translate_fig_1.jpg">
+文中的GAN包含以下两个部分：">
+<meta name="twitter:image" content="FisherCh.github.io/paper_style_1/model.jpg">
 
 
 
@@ -129,13 +134,13 @@
 
 
 
-  <link rel="canonical" href="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/"/>
+  <link rel="canonical" href="FisherCh.github.io/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/"/>
 
 
 
 
 
-  <title> （译）Understanding the Variational Lower Bound | Heterodoxy </title>
+  <title> 论文解读《Style Transfer in Text：Exploration and Evaluation》 | Heterodoxy </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -258,7 +263,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="FisherCh.github.io/2018/04/09/understanding-variational-lower-bound/">
+  <link itemprop="mainEntityOfPage" href="FisherCh.github.io/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Fisher Chen">
@@ -282,7 +287,7 @@
             
             
               
-                （译）Understanding the Variational Lower Bound
+                论文解读《Style Transfer in Text：Exploration and Evaluation》
               
             
           </h1>
@@ -297,8 +302,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-09T21:45:52+08:00">
-                2018-04-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-11T21:58:03+08:00">
+                2018-04-11
               </time>
             
 
@@ -333,25 +338,72 @@
       
 
       
-        <ul>
-<li><a href="http://legacydirs.umiacs.umd.edu/~xyang35/files/understanding-variational-lower.pdf" target="_blank" rel="external">原文链接</a></li>
+        <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1 简介"></a>1 简介</h2><p>用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。</p>
+<h2 id="2-内容"><a href="#2-内容" class="headerlink" title="2 内容"></a>2 内容</h2><h3 id="2-1-基本结构"><a href="#2-1-基本结构" class="headerlink" title="2.1 基本结构"></a>2.1 基本结构</h3><p>文章提出了两种风格转换的模型，但其根本在于如何提取出不含“风格”的内容变量。模型需要一个判别器来断定是否含有“风格”因素，文章借助GAN的结构，采取一种讨巧的思路：用判别器对文本特征进行风格归类，当判别器失效，可认为当前特征不含风格信息。</p>
+<p><img src="paper_style_1/model.jpg" alt=""></p>
+<p>文中的GAN包含以下两个部分：</p>
+<ul>
+<li>判别器</li>
 </ul>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力”机制有关的论文中对学习规则的推导。</p>
-<h2 id="2-变分下界"><a href="#2-变分下界" class="headerlink" title="2 变分下界"></a>2 变分下界</h2><h3 id="2-1-问题提出"><a href="#2-1-问题提出" class="headerlink" title="2.1 问题提出"></a>2.1 问题提出</h3><p>假设$X$是观察数据，而$Z$是潜在的变量。请注意，一般情况下，隐变量可能包含参数。（原文： Note that we are general – the hidden variables might include the “parameters”.）这两个变量的关系可用以下的图模型表示（figure 1）。</p>
-<div align="center"><br><img src="/img/translation_2/translate_fig_1.jpg" width="80%" class="img-shadow"><br></div>
-
-<p>更进一步，令大写$P(X)$表示该变量的概率分布，小写$p(X)$表示变量X的概率密度函数。根据贝叶斯理论，隐变量的后验分布可表示为：<br>$$<br>p(Z|X)=\frac{ p(X|Z) p(Z) }{ p(X) } = \frac{p(X|Z) p(Z)}{ \int_Z p(X,Z) }<br>$$</p>
-<h3 id="2-2-Jensen不等式"><a href="#2-2-Jensen不等式" class="headerlink" title="2.2 Jensen不等式"></a>2.2 Jensen不等式</h3><p>我们从log概率出发进行观察（$X$的边缘分布），可得到：<br>$$<br>\begin{aligned}<br>\log p(X)<br>&amp;= \log \int_Z p(X,Z)    \qquad(1) \<br>&amp;=\log \int_Z p(X,Z)  \frac{q(Z)}{q(Z)} \quad(2)\<br>&amp;=\log \left (  \mathbb{E}_q \left [  \frac{p(X,Z)}{ q(Z) } \right ]  \right ) \quad(3)\<br>&amp;\geq \mathbb{E}_q \left [ \log \frac{ p(X,Z) }{ q(Z) } \right ]  \qquad(4)\<br>&amp;= \mathbb{E}_q [ \log p(X,Z) ] + H(Z) \qquad(5)<br>\end{aligned}<br>$$</p>
-<p>其中，式子（5）即为变分下界，或称为ELBO。</p>
-<p>式子（2）中的分布$q(Z)$是用来近似替代VB中真实后验分布$p(Z|X)$。在此处。。。。式子（4）将Jensen不等式（$ f( \mathbb{E}[X] )  \leq \mathbb{E}[ f(X) ]$）套在凸对数函数上。$H(Z)=- \mathbb{E} \left( \log_q (Z) \right)$表示香农熵。</p>
-<p>进一步令<br>$$<br>L= \mathbb{E}_q [ \log p(X,Z) ] + H(Z),<br>$$<br>显然$L$是观察数据的log概率的下界。因而，如果想最大化数据的边缘概率，可转化为最大化这个下界$L$。</p>
-<h3 id="2-3-KL散度"><a href="#2-3-KL散度" class="headerlink" title="2.3 KL散度"></a>2.3 KL散度</h3><p>在最后一节，我们不会将重点过多放在分布$p(Z)$。然而，关于$p(Z)$这个分布的讨论实际上是系列VB方法的核心。多数情况下，后验分布$p(Z|X)$的计算常常难以进行。例如，在求分母时就需要对所有情况的隐变量求积分（或求和）。</p>
-<p>变分方法背后的主要思路是：找一个与真实后验分布$p(Z|X)$尽可能相近的分布$q(Z)$来近似代替。这些近似的分布可以有自己的变分参数$q(Z| \theta)$，而我们要做的就是通过设置参数来让$q$靠近其后验。显然，应当要求这些分布$q(Z)$形式简单且更加易于推断。</p>
-<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：<br>$$<br>\begin{aligned}<br>KL[ q(Z) || p(Z|X) ]<br>&amp;= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \<br>&amp;= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} - \int_Z q(Z) \log p(X) \right)  \quad(8) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  + \log p(X) \int_Z q(Z)  \quad(9) \<br>&amp;= -L +\log p(X) \qquad(10)<br>\end{aligned}<br>$$</p>
-<p>其中$L$是上文提到的变分下界。式子（10）由$\int_Z q(Z)=1$代入得到。移项可得：<br>$$<br>L=\log p(X) - KL[ q(Z) || p(Z|X) ].<br>$$<br>由于KL散度恒大于0，再一次得到$L \leq \log p(X)$是观察数据log概率的一个下界。并且可得知二者的差为近似与真实分布间的KL散度。换句话说，当近似的分布与真实分布完全重合（perfectly closed），下界$L$等于log概率。</p>
-<h2 id="3-举例"><a href="#3-举例" class="headerlink" title="3 举例"></a>3 举例</h2><h3 id="3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><a href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）" class="headerlink" title="3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）"></a>3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</h3><p>现在，我们可凭借对变分下界的理解来推断实际问题的学习规则。本文以论文（<a href="https://arxiv.org/abs/1412.7755" target="_blank" rel="external">Ba et al., 2014</a>）为例。</p>
-<p>首先，我们需要最大化分类标签的log似然：$\log p(y | I, W)$。此处$I$为输入图像，$W$是模型参数，而$y$是类别的标签，也是我们可以视为观测数据的变量。之后，依据对位置$l$（隐变量）的边缘化，目标函数的形式可以变为：<br>$$<br>\log p(y | I, W) = \log \sum_l p(l | I,W)p(y | l, I ,W)<br>$$<br>通过Jensen不等式可直接得到下界：<br>$$<br>\log \sum_l p(l | I,W)p(y | l, I ,W)<br> \geq<br> \sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>当然，通过观察数据边缘分布的变分下界，假定$q(l)=p(l| I,W)$，也可得到相同的结果：<br>$$<br>\log p(y|I,W) \geq<br>\sum_l q(l) \log \frac{p(y,l |I,W)}{q(l)} =<br>\sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>之后，可以根据这变分下界对模型参数$W$求导，来最大化这个下界。论文（<a href="https://arxiv.org/abs/1502.03044" target="_blank" rel="external">Xu et al., 2015</a>）中也采用了几乎相同的求导策略。</p>
-<h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4 总结"></a>4 总结</h2><p>本文介绍了什么是变分下界以及其在VB方法的地位。本文通过两种不同的方法推导变分下界，并提供它与其他实体关系的清晰思路。本文还通过一个具体的例子展示了如何使用变分下界来获得实用的学习规则，这对理解相关论文非常有用。</p>
+<p>用于判别输入文本属于哪种风格（二分类），结构由一个多层感知机（Multi-layer Perceptron, MLP）接上一层softmax，输入为从Encoder GRU得到的Hidden State。设其中参数为$\Theta<em>c$，对判别器的训练自然是尽可能区分文本类别，即<br>$$<br>L</em>{adv1} (\Theta<em>c) = - \sum</em>{i=1}^{M} \log p( l_i| Encoder(X_i; \Theta_e); \Theta_c )<br>$$</p>
+<ul>
+<li>自编码机</li>
+</ul>
+<p>传统的seq2seq结构，Encoder和Decoder皆为GRU，需优化参数为编码机$\Theta_e$与解码器$ \Theta<em>d$。自编码机的首要目标是能对输入样本完全重构，即<br>$$<br>L</em>{seq2seq}(\Theta<em>{e}, \Theta</em>{d}) = - \sum_{i=1}^{M}\log P( X_i | X<em>i; \Theta</em>{e}, \Theta_{d})<br>$$</p>
+<ul>
+<li>判别失效</li>
+</ul>
+<p>编码机的一个主要任务是提取出不含风格因素的内容向量，因而需优化参数$\Theta<em>e$来最大化熵，令判别器失效，即<br>$$<br>L</em>{adv2}(\Theta<em>e) = -\sum</em>{i=1}^{M} \sum_{j=1}^{N} H(p(j| Encoder(x_i; \Theta_e); \theta_c)),<br>$$</p>
+<h3 id="2-2-具体应用"><a href="#2-2-具体应用" class="headerlink" title="2.2 具体应用"></a>2.2 具体应用</h3><p>文章的对风格的体现有两种方式：一是用不同的解码器；二是用“风格向量”表示，且同一风格的向量固定。</p>
+<ul>
+<li>多解码器</li>
+</ul>
+<p>该模型可理解为由两个seq2seq组成，且二者共用一个Encoder，因而其总的损失函数表示为<br>$$<br>L_{total1}( \Theta<em>e, \Theta</em>{d1}, \Theta_{d2}, \Theta<em>c ) \<br>= L</em>{seq2seq}(\Theta<em>{e}, \Theta</em>{d1})  + L<em>{seq2seq}(\Theta</em>{e}, \Theta<em>{d2})  + L</em>{adv1} (\Theta<em>c) + L</em>{adv2} (\Theta_e)<br>$$</p>
+<ul>
+<li>风格Embedding</li>
+</ul>
+<p>该方法除了自编码机与判别器，还需优化一个风格矩阵$\rm{E} \in R^{N \times d_S}$，$N$为风格数量，$d<em>S$为风格变量的维数。同时，解码器的输入需修改为hidden State与风格变量的拼接。<br>$$<br>L</em>{total2}( \Theta<em>e, \Theta</em>{d}, \Theta<em>c, \rm{E} ) \<br>= L</em>{seq2seq}(\Theta<em>{e}, \Theta</em>{d}, \rm{E})   + L_{adv1} (\Theta<em>c) + L</em>{adv2} (\Theta_e)<br>$$</p>
+<h2 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h2><h3 id="3-1-数据集"><a href="#3-1-数据集" class="headerlink" title="3.1 数据集"></a>3.1 数据集</h3><p>文章采用两个数据集：文章标题（包含论文标题与新闻标题），亚马逊商品评论</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">数据</th>
+<th style="text-align:center">标题</th>
+<th style="text-align:center">评论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">风格归类</td>
+<td style="text-align:center">paper/ news</td>
+<td style="text-align:center">positive/ negative</td>
+</tr>
+<tr>
+<td style="text-align:center">句子数量</td>
+<td style="text-align:center">107,538 / 108,503</td>
+<td style="text-align:center">400,000 / 400,000</td>
+</tr>
+<tr>
+<td style="text-align:center">词汇总数</td>
+<td style="text-align:center">80,000</td>
+<td style="text-align:center">60,000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-2-评估方式"><a href="#3-2-评估方式" class="headerlink" title="3.2 评估方式"></a>3.2 评估方式</h3><p>由于数据集缺少平行语料库，无法用BLEU或Rouge等常用手法。文章提出从转换能力与保留程度衡量转换结果。</p>
+<ul>
+<li>转换能力</li>
+</ul>
+<p>这一项用于测试模型是否能较好地转换文本为另一风格。借助一个基于文本的风格判别器（LSTM+sigmoid），对转换后的文本判定风格，统计成功转换的句子占比$\frac{N<em>{right}}{N</em>{total}}$。</p>
+<ul>
+<li>文本保留</li>
+</ul>
+<p>文章认为单纯注重转换能力的行为有失偏颇，转换时应当保留关键信息，因而提出测量转换前后句子相似度的方法。文中通过句子特征的余弦距离计算相似度，句子特征定义如下：</p>
+<p>设句子$S={w_1, w_2, \cdots, w_n }$，$w<em>i$是第$i$个词的Embedding。而句子特征$v=[v</em>{min}, v<em>{mean}, v</em>{max}]$，其中<br>$$<br>v_{min}[i] = min{ w_1[i],  \cdots , w<em>n[i] }  \<br>v</em>{mean}[i] = mean{ w_1[i],  \cdots , w<em>n[i] }  \<br>v</em>{max}[i] = max{ w_1[i],  \cdots , w<em>n[i] }<br>$$<br>最终得分的计算为<br>$$<br>score = \frac{ v</em>{s}^{T} v_t  }{ | v_s | \cdot  | v_t |   }<br>$$<br>为说明该方法的合理性，通过<a href="https://www.mturk.com/" target="_blank" rel="external">人工测试</a>与算法的结果进行对比。</p>
+<h3 id="3-3-结果"><a href="#3-3-结果" class="headerlink" title="3.3 结果"></a>3.3 结果</h3><p>对两个数据集的测试如下图，纵轴为文本保留程度，横轴为转换能力。一种颜色代表同个模型，其中的每个结点代表不同超参的结果。</p>
+<p><img src="paper_style_1/model_result.jpg" alt=""></p>
+<p>部分文本转换效果如下：</p>
+<p><img src="paper_style_1/model_result2.jpg" alt=""></p>
 
       
     </div>
@@ -375,9 +427,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/translation/" rel="tag"># translation</a>
+            <a href="/tags/style-transfer/" rel="tag"># style-transfer</a>
           
-            <a href="/tags/vae/" rel="tag"># vae</a>
+            <a href="/tags/reading/" rel="tag"># reading</a>
           
         </div>
       
@@ -386,8 +438,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/04/learn-pytorch-01/" rel="next" title="learn pytorch(1)">
-                <i class="fa fa-chevron-left"></i> learn pytorch(1)
+              <a href="/2018/04/11/关于文章风格的一点思考/" rel="next" title="关于文章风格的一点思考">
+                <i class="fa fa-chevron-left"></i> 关于文章风格的一点思考
               </a>
             
           </div>
@@ -395,10 +447,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/11/关于文章风格的一点思考/" rel="prev" title="关于文章风格的一点思考">
-                关于文章风格的一点思考 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -534,7 +582,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-变分下界"><span class="nav-number">2.</span> <span class="nav-text">2 变分下界</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-问题提出"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 问题提出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Jensen不等式"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Jensen不等式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-KL散度"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 KL散度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-举例"><span class="nav-number">3.</span> <span class="nav-text">3 举例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-总结"><span class="nav-number">4.</span> <span class="nav-text">4 总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-简介"><span class="nav-number">1.</span> <span class="nav-text">1 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-内容"><span class="nav-number">2.</span> <span class="nav-text">2 内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-基本结构"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 基本结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-具体应用"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 具体应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-实验"><span class="nav-number">3.</span> <span class="nav-text">3 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-数据集"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-评估方式"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 评估方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-结果"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 结果</span></a></li></ol></li></ol></div>
             
 
           </div>

@@ -105,7 +105,7 @@
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model_result.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model_result2.jpg">
-<meta property="og:updated_time" content="2018-04-11T14:22:25.582Z">
+<meta property="og:updated_time" content="2018-04-11T14:30:40.246Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文解读《Style Transfer in Text：Exploration and Evaluation》">
 <meta name="twitter:description" content="1 简介用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。
@@ -358,28 +358,28 @@
 <li>判别器</li>
 </ul>
 <p>用于判别输入文本属于哪种风格（二分类），结构由一个多层感知机（Multi-layer Perceptron, MLP）接上一层softmax，输入为从Encoder GRU得到的Hidden State。设其中参数为$\Theta_c$，对判别器的训练自然是尽可能区分文本类别，即</p>
-<p>$$<br>L_{adv1} (\Theta<em>c) = - \sum</em>{i=1}^{M} \log p( l_i| Encoder(X_i; \Theta_e); \Theta_c )<br>$$</p>
+<p>$$<br>L_{adv1} ( \Theta<em>c ) = - \sum</em>{ i=1 }^{ M } \log p( l_i  |  Encoder( X_i; \Theta_e ); \Theta_c )<br>$$</p>
 <ul>
 <li>自编码机</li>
 </ul>
 <p>传统的seq2seq结构，Encoder和Decoder皆为GRU，需优化参数为编码机$\Theta_e$与解码器$ \Theta_d$。自编码机的首要目标是能对输入样本完全重构，即</p>
-<p>$$<br>L<em>{seq2seq}(\Theta</em>{e}, \Theta<em>{d}) = - \sum</em>{i=1}^{M}\log P( X_i | X<em>i; \Theta</em>{e}, \Theta_{d})<br>$$</p>
+<p>$$<br>L<em>{ seq2seq }( \Theta</em>{e}, \Theta<em>{d} ) = - \sum</em>{ i=1 }^{ M } \log P( X_i |  X<em>i; \Theta</em>{e} ,  \Theta_{d} )<br>$$</p>
 <ul>
 <li>判别失效</li>
 </ul>
 <p>编码机的一个主要任务是提取出不含风格因素的内容向量，因而需优化参数$\Theta_e$来最大化熵，令判别器失效，即</p>
-<p>$$<br>L_{adv2}(\Theta<em>e) = -\sum</em>{i=1}^{M} \sum_{j=1}^{N} H(p(j| Encoder(x_i; \Theta_e); \theta_c)),<br>$$</p>
+<p>$$<br>L_{adv2}( \Theta<em>e ) = - \sum</em>{ i=1 }^{ M } \sum_{ j=1 }^{ N } H(p( j |  Encoder(x_i; \Theta_e ) ; \theta_c ) ),<br>$$</p>
 <h3 id="2-2-具体应用"><a href="#2-2-具体应用" class="headerlink" title="2.2 具体应用"></a>2.2 具体应用</h3><p>文章的对风格的体现有两种方式：一是用不同的解码器；二是用“风格向量”表示，且同一风格的向量固定。</p>
 <ul>
 <li>多解码器</li>
 </ul>
 <p>该模型可理解为由两个seq2seq组成，且二者共用一个Encoder，因而其总的损失函数表示为</p>
-<p>$$<br>L_{total1}( \Theta<em>e, \Theta</em>{d1}, \Theta_{d2}, \Theta<em>c ) \<br>= L</em>{seq2seq}(\Theta<em>{e}, \Theta</em>{d1})  + L<em>{seq2seq}(\Theta</em>{e}, \Theta<em>{d2})  + L</em>{adv1} (\Theta<em>c) + L</em>{adv2} (\Theta_e)<br>$$</p>
+<p>$$<br>L_{ total1 }( \Theta<em>e, \Theta</em>{ d1 }, \Theta_{ d2 }, \Theta<em>c )<br>= L</em>{ seq2seq }( \Theta<em>{e}, \Theta</em>{d1} )  + L<em>{ seq2seq }( \Theta</em>{e},  \Theta<em>{d2} )  + L</em>{ adv1 } ( \Theta<em>c ) + L</em>{ adv2 } ( \Theta_e )<br>$$</p>
 <ul>
 <li>风格Embedding</li>
 </ul>
 <p>该方法除了自编码机与判别器，还需优化一个风格矩阵$\rm{E} \in R^{N \times d_S}$，$N$ 为风格数量，$d_S$ 为风格变量的维数。同时，解码器的输入需修改为hidden State与风格变量的拼接。</p>
-<p>$$<br>L_{total2}( \Theta<em>e, \Theta</em>{d}, \Theta<em>c, \rm{E} ) \<br>= L</em>{seq2seq}(\Theta<em>{e}, \Theta</em>{d}, \rm{E})   + L_{adv1} (\Theta<em>c) + L</em>{adv2} (\Theta_e)<br>$$</p>
+<p>$$<br>L_{total2}( \Theta<em>e, \Theta</em>{d}, \Theta<em>c, \rm{E} )<br>= L</em>{seq2seq}( \Theta<em>{e},  \Theta</em>{d},  \rm{E})   + L_{adv1} ( \Theta<em>c ) + L</em>{ adv2 }  (\Theta_e )<br>$$</p>
 <h2 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h2><h3 id="3-1-数据集"><a href="#3-1-数据集" class="headerlink" title="3.1 数据集"></a>3.1 数据集</h3><p>文章采用两个数据集：文章标题（包含论文标题与新闻标题），亚马逊商品评论</p>
 <table>
 <thead>

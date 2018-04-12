@@ -337,7 +337,7 @@
 <p>(Wei Xu, 2012: Microsoft-Paraphrasing for style.)莎比转现代</p>
 <p>数据集：<br>Reuters Corpus Volume 1(RCV1) 包括800,000 newswire stories，109,433 texts with indicated authorship and 2,361 different authors in total<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> fetch_rcv1</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>rcv1 = fetch_rcv1()</div></pre></td></tr></table></figure></p>
 <p><a href="http://norvig.com/ngrams/shakespeare.txt" target="_blank" rel="external">http://norvig.com/ngrams/shakespeare.txt</a> 莎士比亚4M文本<br><a href="https://www.kaggle.com/c/wikichallenge/Data" target="_blank" rel="external">https://www.kaggle.com/c/wikichallenge/Data</a> 近1个G的维基百科文本<br><a href="https://ota.ox.ac.uk/" target="_blank" rel="external">https://ota.ox.ac.uk/</a> 牛津的文本库，各种戏剧剧本以及文学作品</p>
-<h1 id="文章一："><a href="#文章一：" class="headerlink" title="文章一："></a>文章一：</h1><p>Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation，2014<br>用“编码-解码”的结构学习词组表示。<br>整个结构输入序列{x}，输出序列{y}<br>encoder: 普通的LSTM，通过LSTM对输入预测下一个词。<br>训练后，取最后结点的中间状态c，来表示输入序列的特征，作为解码机的输入。因此可认为c为序列的表示<br>decoder：LSTM，下一个结点的output（h<em>{t+1}）是f(h</em>{t},y_{t},c)<br>目标函数：<br>最大化log似然</p>
+<h1 id="文章一："><a href="#文章一：" class="headerlink" title="文章一："></a>文章一：</h1><p>Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation，2014<br>用“编码-解码”的结构学习词组表示。<br>整个结构输入序列{x}，输出序列{y}<br>encoder: 普通的LSTM，通过LSTM对输入预测下一个词。<br>训练后，取最后结点的中间状态c，来表示输入序列的特征，作为解码机的输入。因此可认为c为序列的表示<br>decoder：LSTM，下一个结点的output（h_{t+1}）是f(h_{t},y_{t},c)<br>目标函数：<br>最大化log似然</p>
 <p>疑问：<br>1 词向量的表示：one-hot or word2vec?<br>2 无论编码或解码均提到概率表示，所以是one-hot？但这样词之间无关联，且过于稀疏<br>3 文章提到RNN能学习一个 probability distribution</p>
 <p>文章风格：用词+词序。</p>
 
@@ -372,8 +372,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/09/understanding-variational-lower-bound/" rel="next" title="（译）Understanding the Variational Lower Bound">
-                <i class="fa fa-chevron-left"></i> （译）Understanding the Variational Lower Bound
+              <a href="/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/" rel="next" title="论文解读《Style Transfer in Text：Exploration and Evaluation》">
+                <i class="fa fa-chevron-left"></i> 论文解读《Style Transfer in Text：Exploration and Evaluation》
               </a>
             
           </div>
@@ -381,10 +381,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/" rel="prev" title="论文解读《Style Transfer in Text：Exploration and Evaluation》">
-                论文解读《Style Transfer in Text：Exploration and Evaluation》 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>

@@ -90,7 +90,9 @@
 
 
 
-文中的GAN包含以下两个部分">
+
+
+文中的GAN包含以下两个">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文解读《Style Transfer in Text：Exploration and Evaluation》">
 <meta property="og:url" content="FisherCh.github.io/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/index.html">
@@ -101,7 +103,9 @@
 
 
 
-文中的GAN包含以下两个部分">
+
+
+文中的GAN包含以下两个">
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model_result.jpg">
 <meta property="og:image" content="FisherCh.github.io/img/paper_style_1/model_result2.jpg">
@@ -114,7 +118,9 @@
 
 
 
-文中的GAN包含以下两个部分">
+
+
+文中的GAN包含以下两个">
 <meta name="twitter:image" content="FisherCh.github.io/img/paper_style_1/model.jpg">
 
 
@@ -349,7 +355,9 @@
       
         <h2 id="1-简介"><a href="#1-简介" class="headerlink" title="1 简介"></a>1 简介</h2><p>用GAN的方法抽取文本内容向量，偏向工程类，内容上相对简单。可借鉴论文中对目标函数的设计。</p>
 <h2 id="2-内容"><a href="#2-内容" class="headerlink" title="2 内容"></a>2 内容</h2><h3 id="2-1-基本结构"><a href="#2-1-基本结构" class="headerlink" title="2.1 基本结构"></a>2.1 基本结构</h3><p>文章提出了两种风格转换的模型，但其根本在于如何提取出不含“风格”的内容变量。模型需要一个判别器来断定是否含有“风格”因素，文章借助GAN的结构，采取一种讨巧的思路：用判别器对文本特征进行风格归类，当判别器失效，可认为当前特征不含风格信息。</p>
-<div align="center"><br><img src="/img/paper_style_1/model.jpg" width="80%" class="img-shadow"><br></div>
+<div align="center">
+<img src="/img/paper_style_1/model.jpg" width="80%" class="img-shadow">
+</div>
 
 
 
@@ -358,29 +366,32 @@
 <li>判别器</li>
 </ul>
 <p>用于判别输入文本属于哪种风格（二分类），结构由一个多层感知机（Multi-layer Perceptron, MLP）接上一层softmax，输入为从Encoder GRU得到的Hidden State。设其中参数为$\Theta_c$，对判别器的训练自然是尽可能区分文本类别，即</p>
-<p>$$<br>L_{adv1} ( \Theta<em>c ) = - \sum</em>{ i=1 }^{ M } \log p( l_i  |  Encoder( X_i; \Theta_e ); \Theta_c )<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+L_{adv1} ( \Theta_c ) = - \sum_{ i=1 }^{ M } \log p( l_i  |  Encoder( X_i; \Theta_e ); \Theta_c )</script><ul>
 <li>自编码机</li>
 </ul>
 <p>传统的seq2seq结构，Encoder和Decoder皆为GRU，需优化参数为编码机$\Theta_e$与解码器$ \Theta_d$。自编码机的首要目标是能对输入样本完全重构，即</p>
-<p>$$<br>L<em>{ seq2seq }( \Theta</em>{e}, \Theta<em>{d} ) = - \sum</em>{ i=1 }^{ M } \log P( X_i |  X<em>i; \Theta</em>{e} ,  \Theta_{d} )<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+L_{ seq2seq }( \Theta_{e}, \Theta_{d} ) = - \sum_{ i=1 }^{ M } \log P( X_i |  X_i; \Theta_{e} ,  \Theta_{d} )</script><ul>
 <li>判别失效</li>
 </ul>
 <p>编码机的一个主要任务是提取出不含风格因素的内容向量，因而需优化参数$\Theta_e$来最大化熵，令判别器失效，即</p>
-<p>$$<br>L_{adv2}( \Theta<em>e ) = - \sum</em>{ i=1 }^{ M } \sum_{ j=1 }^{ N } H(p( j |  Encoder(x_i; \Theta_e ) ; \theta_c ) ),<br>$$</p>
-<h3 id="2-2-具体应用"><a href="#2-2-具体应用" class="headerlink" title="2.2 具体应用"></a>2.2 具体应用</h3><p>文章的对风格的体现有两种方式：一是用不同的解码器；二是用“风格向量”表示，且同一风格的向量固定。</p>
+<script type="math/tex; mode=display">
+L_{adv2}( \Theta_e ) = - \sum_{ i=1 }^{ M } \sum_{ j=1 }^{ N } H(p( j |  Encoder(x_i; \Theta_e ) ; \theta_c ) ),</script><h3 id="2-2-具体应用"><a href="#2-2-具体应用" class="headerlink" title="2.2 具体应用"></a>2.2 具体应用</h3><p>文章的对风格的体现有两种方式：一是用不同的解码器；二是用“风格向量”表示，且同一风格的向量固定。</p>
 <ul>
 <li>多解码器</li>
 </ul>
 <p>该模型可理解为由两个seq2seq组成，且二者共用一个Encoder，因而其总的损失函数表示为</p>
-<p>$$<br>L_{ total1 }( \Theta<em>e, \Theta</em>{ d1 }, \Theta_{ d2 }, \Theta<em>c )<br>= L</em>{ seq2seq }( \Theta<em>{e}, \Theta</em>{d1} )  + L<em>{ seq2seq }( \Theta</em>{e},  \Theta<em>{d2} )  + L</em>{ adv1 } ( \Theta<em>c ) + L</em>{ adv2 } ( \Theta_e )<br>$$</p>
-<ul>
+<script type="math/tex; mode=display">
+L_{ total1 }( \Theta_e, \Theta_{ d1 }, \Theta_{ d2 }, \Theta_c ) 
+= L_{ seq2seq }( \Theta_{e}, \Theta_{d1} )  + L_{ seq2seq }( \Theta_{e},  \Theta_{d2} )  + L_{ adv1 } ( \Theta_c ) + L_{ adv2 } ( \Theta_e )</script><ul>
 <li>风格Embedding</li>
 </ul>
 <p>该方法除了自编码机与判别器，还需优化一个风格矩阵$\rm{E} \in R^{N \times d_S}$，$N$ 为风格数量，$d_S$ 为风格变量的维数。同时，解码器的输入需修改为hidden State与风格变量的拼接。</p>
-<p>$$<br>L_{total2}( \Theta<em>e, \Theta</em>{d}, \Theta<em>c, \rm{E} )<br>= L</em>{seq2seq}( \Theta<em>{e},  \Theta</em>{d},  \rm{E})   + L_{adv1} ( \Theta<em>c ) + L</em>{ adv2 }  (\Theta_e )<br>$$</p>
-<h2 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h2><h3 id="3-1-数据集"><a href="#3-1-数据集" class="headerlink" title="3.1 数据集"></a>3.1 数据集</h3><p>文章采用两个数据集：文章标题（包含论文标题与新闻标题），亚马逊商品评论</p>
+<script type="math/tex; mode=display">
+L_{total2}( \Theta_e, \Theta_{d}, \Theta_c, \rm{E} ) 
+= L_{seq2seq}( \Theta_{e},  \Theta_{d},  \rm{E})   + L_{adv1} ( \Theta_c ) + L_{ adv2 }  (\Theta_e )</script><h2 id="3-实验"><a href="#3-实验" class="headerlink" title="3 实验"></a>3 实验</h2><h3 id="3-1-数据集"><a href="#3-1-数据集" class="headerlink" title="3.1 数据集"></a>3.1 数据集</h3><p>文章采用两个数据集：文章标题（包含论文标题与新闻标题），亚马逊商品评论</p>
+<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -407,27 +418,34 @@
 </tr>
 </tbody>
 </table>
+</div>
 <h3 id="3-2-评估方式"><a href="#3-2-评估方式" class="headerlink" title="3.2 评估方式"></a>3.2 评估方式</h3><p>由于数据集缺少平行语料库，无法用BLEU或Rouge等常用手法。文章提出从转换能力与保留程度衡量转换结果。</p>
 <ul>
 <li>转换能力</li>
 </ul>
-<p>这一项用于测试模型是否能较好地转换文本为另一风格。借助一个基于文本的风格判别器（LSTM+sigmoid），对转换后的文本判定风格，统计成功转换的句子占比$\frac{N<em>{right}}{N</em>{total}}$。</p>
+<p>这一项用于测试模型是否能较好地转换文本为另一风格。借助一个基于文本的风格判别器（LSTM+sigmoid），对转换后的文本判定风格，统计成功转换的句子占比$\frac{N_{right}}{N_{total}}$。</p>
 <ul>
 <li>文本保留</li>
 </ul>
 <p>文章认为单纯注重转换能力的行为有失偏颇，转换时应当保留关键信息，因而提出测量转换前后句子相似度的方法。文中通过句子特征的余弦距离计算相似度，句子特征定义如下：</p>
-<p>设句子$S={w_1, w_2, \cdots, w_n }$，$w<em>i$是第$i$个词的Embedding。而句子特征$v=[v</em>{min}, v<em>{mean}, v</em>{max}]$，其中</p>
-<p>$$<br>v_{min}[i] = min{ w_1[i],  \cdots , w<em>n[i] }  \<br>v</em>{mean}[i] = mean{ w_1[i],  \cdots , w<em>n[i] }  \<br>v</em>{max}[i] = max{ w_1[i],  \cdots , w_n[i] }<br>$$</p>
-<p>最终得分的计算为</p>
-<p>$$<br>score = \frac{ v_{s}^{T} v_t  }{ | v_s | \cdot  | v_t |   }<br>$$</p>
-<p>为说明该方法的合理性，通过<a href="https://www.mturk.com/" target="_blank" rel="external">人工测试</a>与算法的结果进行对比。</p>
+<p>设句子$S={w_1, w_2, \cdots, w_n }$，$w_i$是第$i$个词的Embedding。而句子特征$v=[v_{min}, v_{mean}, v_{max}]$，其中</p>
+<script type="math/tex; mode=display">
+v_{min}[i] = min\{ w_1[i],  \cdots , w_n[i] \}  \\
+v_{mean}[i] = mean\{ w_1[i],  \cdots , w_n[i] \}  \\
+v_{max}[i] = max\{ w_1[i],  \cdots , w_n[i] \}</script><p>最终得分的计算为</p>
+<script type="math/tex; mode=display">
+score = \frac{ v_{s}^{T} v_t  }{ \| v_s \| \cdot  \| v_t \|   }</script><p>为说明该方法的合理性，通过<a href="https://www.mturk.com/" target="_blank" rel="external">人工测试</a>与算法的结果进行对比。</p>
 <h3 id="3-3-结果"><a href="#3-3-结果" class="headerlink" title="3.3 结果"></a>3.3 结果</h3><p>对两个数据集的测试如下图，纵轴为文本保留程度，横轴为转换能力。一种颜色代表同个模型，其中的每个结点代表不同超参的结果。</p>
-<div align="center"><br><img src="/img/paper_style_1/model_result.jpg" width="80%" class="img-shadow"><br></div>
+<div align="center">
+<img src="/img/paper_style_1/model_result.jpg" width="80%" class="img-shadow">
+</div>
 
 
 
 <p>部分文本转换效果如下：</p>
-<div align="center"><br><img src="/img/paper_style_1/model_result2.jpg" width="80%" class="img-shadow"><br></div>
+<div align="center">
+<img src="/img/paper_style_1/model_result2.jpg" width="80%" class="img-shadow">
+</div>
 
 
       
@@ -463,8 +481,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/11/关于文章风格的一点思考/" rel="next" title="关于文章风格的一点思考">
-                <i class="fa fa-chevron-left"></i> 关于文章风格的一点思考
+              <a href="/2018/04/09/understanding-variational-lower-bound/" rel="next" title="（译）Understanding the Variational Lower Bound">
+                <i class="fa fa-chevron-left"></i> （译）Understanding the Variational Lower Bound
               </a>
             
           </div>
@@ -472,6 +490,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/11/关于文章风格的一点思考/" rel="prev" title="关于文章风格的一点思考">
+                关于文章风格的一点思考 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>

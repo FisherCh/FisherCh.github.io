@@ -338,19 +338,52 @@
 </ul>
 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>变分贝叶斯（VB）方法是统计机器学习中非常流行的一类技术。VB方法的一个强大特性是推理 - 优化对偶性：我们可以将统计推断问题（例如，在给定另一个随机变量的值的情况下计算随机变量的值）看作优化问题（例如，找到令目标函数最小化的参数值）。此外，变分下界，也是所谓的证据下界（ELBO），在VB推导中起着至关重要的作用。在本文中，我们旨在介绍变分下界的基本思想，它可以帮助理解与“注意力”机制有关的论文中对学习规则的推导。</p>
 <h2 id="2-变分下界"><a href="#2-变分下界" class="headerlink" title="2 变分下界"></a>2 变分下界</h2><h3 id="2-1-问题提出"><a href="#2-1-问题提出" class="headerlink" title="2.1 问题提出"></a>2.1 问题提出</h3><p>假设$X$是观察数据，而$Z$是潜在的变量。请注意，一般情况下，隐变量可能包含参数。（原文： Note that we are general – the hidden variables might include the “parameters”.）这两个变量的关系可用以下的图模型表示（figure 1）。</p>
-<div align="center"><br><img src="/img/translation_2/translate_fig_1.jpg" width="80%" class="img-shadow"><br></div>
+<div align="center">
+<img src="/img/translation_2/translate_fig_1.jpg" width="80%" class="img-shadow">
+</div>
 
-<p>更进一步，令大写$P(X)$表示该变量的概率分布，小写$p(X)$表示变量X的概率密度函数。根据贝叶斯理论，隐变量的后验分布可表示为：<br>$$<br>p(Z|X)=\frac{ p(X|Z) p(Z) }{ p(X) } = \frac{p(X|Z) p(Z)}{ \int_Z p(X,Z) }<br>$$</p>
-<h3 id="2-2-Jensen不等式"><a href="#2-2-Jensen不等式" class="headerlink" title="2.2 Jensen不等式"></a>2.2 Jensen不等式</h3><p>我们从log概率出发进行观察（$X$的边缘分布），可得到：<br>$$<br>\begin{aligned}<br>\log p(X)<br>&amp;= \log \int_Z p(X,Z)    \qquad(1) \<br>&amp;=\log \int_Z p(X,Z)  \frac{q(Z)}{q(Z)} \quad(2)\<br>&amp;=\log \left (  \mathbb{E}_q \left [  \frac{p(X,Z)}{ q(Z) } \right ]  \right ) \quad(3)\<br>&amp;\geq \mathbb{E}_q \left [ \log \frac{ p(X,Z) }{ q(Z) } \right ]  \qquad(4)\<br>&amp;= \mathbb{E}_q [ \log p(X,Z) ] + H(Z) \qquad(5)<br>\end{aligned}<br>$$</p>
-<p>其中，式子（5）即为变分下界，或称为ELBO。</p>
+<p>更进一步，令大写$P(X)$表示该变量的概率分布，小写$p(X)$表示变量X的概率密度函数。根据贝叶斯理论，隐变量的后验分布可表示为：</p>
+<script type="math/tex; mode=display">
+p(Z|X)=\frac{ p(X|Z) p(Z) }{ p(X) } = \frac{p(X|Z) p(Z)}{ \int_Z p(X,Z) }</script><h3 id="2-2-Jensen不等式"><a href="#2-2-Jensen不等式" class="headerlink" title="2.2 Jensen不等式"></a>2.2 Jensen不等式</h3><p>我们从log概率出发进行观察（$X$的边缘分布），可得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\log p(X) 
+&= \log \int_Z p(X,Z)    \qquad(1) \\
+&=\log \int_Z p(X,Z)  \frac{q(Z)}{q(Z)} \quad(2)\\
+&=\log \left (  \mathbb{E}_q \left [  \frac{p(X,Z)}{ q(Z) } \right ]  \right ) \quad(3)\\
+&\geq \mathbb{E}_q \left [ \log \frac{ p(X,Z) }{ q(Z) } \right ]  \qquad(4)\\
+&= \mathbb{E}_q [ \log p(X,Z) ] + H(Z) \qquad(5)
+\end{aligned}</script><p>其中，式子（5）即为变分下界，或称为ELBO。</p>
 <p>式子（2）中的分布$q(Z)$是用来近似替代VB中真实后验分布$p(Z|X)$。在此处。。。。式子（4）将Jensen不等式（$ f( \mathbb{E}[X] )  \leq \mathbb{E}[ f(X) ]$）套在凸对数函数上。$H(Z)=- \mathbb{E} \left( \log_q (Z) \right)$表示香农熵。</p>
-<p>进一步令<br>$$<br>L= \mathbb{E}_q [ \log p(X,Z) ] + H(Z),<br>$$<br>显然$L$是观察数据的log概率的下界。因而，如果想最大化数据的边缘概率，可转化为最大化这个下界$L$。</p>
+<p>进一步令</p>
+<script type="math/tex; mode=display">
+L= \mathbb{E}_q [ \log p(X,Z) ] + H(Z),</script><p>显然$L$是观察数据的log概率的下界。因而，如果想最大化数据的边缘概率，可转化为最大化这个下界$L$。</p>
 <h3 id="2-3-KL散度"><a href="#2-3-KL散度" class="headerlink" title="2.3 KL散度"></a>2.3 KL散度</h3><p>在最后一节，我们不会将重点过多放在分布$p(Z)$。然而，关于$p(Z)$这个分布的讨论实际上是系列VB方法的核心。多数情况下，后验分布$p(Z|X)$的计算常常难以进行。例如，在求分母时就需要对所有情况的隐变量求积分（或求和）。</p>
 <p>变分方法背后的主要思路是：找一个与真实后验分布$p(Z|X)$尽可能相近的分布$q(Z)$来近似代替。这些近似的分布可以有自己的变分参数$q(Z| \theta)$，而我们要做的就是通过设置参数来让$q$靠近其后验。显然，应当要求这些分布$q(Z)$形式简单且更加易于推断。</p>
-<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：<br>$$<br>\begin{aligned}<br>KL[ q(Z) || p(Z|X) ]<br>&amp;= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \<br>&amp;= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} - \int_Z q(Z) \log p(X) \right)  \quad(8) \<br>&amp;= - \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  + \log p(X) \int_Z q(Z)  \quad(9) \<br>&amp;= -L +\log p(X) \qquad(10)<br>\end{aligned}<br>$$</p>
-<p>其中$L$是上文提到的变分下界。式子（10）由$\int_Z q(Z)=1$代入得到。移项可得：<br>$$<br>L=\log p(X) - KL[ q(Z) || p(Z|X) ].<br>$$<br>由于KL散度恒大于0，再一次得到$L \leq \log p(X)$是观察数据log概率的一个下界。并且可得知二者的差为近似与真实分布间的KL散度。换句话说，当近似的分布与真实分布完全重合（perfectly closed），下界$L$等于log概率。</p>
+<p>为了测量分布$q(Z)$和$p(Z|X)$之间的相似度，有一种通用的方法—-KL散度（ Kullback-Leibler divergence）。将KL散度套在本文的变分推断上，得到：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+KL[ q(Z) || p(Z|X) ]
+&= \int_Z q(Z) \log \frac{q(Z)}{p(Z|X)} \quad(6) \\
+&= - \int_Z q(Z) \log \frac{p(Z|X)}{q(Z)} \quad(7) \\
+&= - \left( \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)} - \int_Z q(Z) \log p(X) \right)  \quad(8) \\
+&= - \int_Z q(Z) \log \frac{p(Z,X)}{q(Z)}  + \log p(X) \int_Z q(Z)  \quad(9) \\
+&= -L +\log p(X) \qquad(10)
+\end{aligned}</script><p>其中$L$是上文提到的变分下界。式子（10）由$\int_Z q(Z)=1$代入得到。移项可得：</p>
+<script type="math/tex; mode=display">
+L=\log p(X) - KL[ q(Z) || p(Z|X) ].</script><p>由于KL散度恒大于0，再一次得到$L \leq \log p(X)$是观察数据log概率的一个下界。并且可得知二者的差为近似与真实分布间的KL散度。换句话说，当近似的分布与真实分布完全重合（perfectly closed），下界$L$等于log概率。</p>
 <h2 id="3-举例"><a href="#3-举例" class="headerlink" title="3 举例"></a>3 举例</h2><h3 id="3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）"><a href="#3-1-带有视觉注意的多目标回归（Multiple-Object-Recognition-with-Visual-Attention）" class="headerlink" title="3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）"></a>3.1 带有视觉注意的多目标回归（Multiple Object Recognition with Visual Attention）</h3><p>现在，我们可凭借对变分下界的理解来推断实际问题的学习规则。本文以论文（<a href="https://arxiv.org/abs/1412.7755" target="_blank" rel="external">Ba et al., 2014</a>）为例。</p>
-<p>首先，我们需要最大化分类标签的log似然：$\log p(y | I, W)$。此处$I$为输入图像，$W$是模型参数，而$y$是类别的标签，也是我们可以视为观测数据的变量。之后，依据对位置$l$（隐变量）的边缘化，目标函数的形式可以变为：<br>$$<br>\log p(y | I, W) = \log \sum_l p(l | I,W)p(y | l, I ,W)<br>$$<br>通过Jensen不等式可直接得到下界：<br>$$<br>\log \sum_l p(l | I,W)p(y | l, I ,W)<br> \geq<br> \sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>当然，通过观察数据边缘分布的变分下界，假定$q(l)=p(l| I,W)$，也可得到相同的结果：<br>$$<br>\log p(y|I,W) \geq<br>\sum_l q(l) \log \frac{p(y,l |I,W)}{q(l)} =<br>\sum_l p(l | I,W)  \log p(y | l, I ,W)<br>$$<br>之后，可以根据这变分下界对模型参数$W$求导，来最大化这个下界。论文（<a href="https://arxiv.org/abs/1502.03044" target="_blank" rel="external">Xu et al., 2015</a>）中也采用了几乎相同的求导策略。</p>
+<p>首先，我们需要最大化分类标签的log似然：$\log p(y | I, W)$。此处$I$为输入图像，$W$是模型参数，而$y$是类别的标签，也是我们可以视为观测数据的变量。之后，依据对位置$l$（隐变量）的边缘化，目标函数的形式可以变为：</p>
+<script type="math/tex; mode=display">
+\log p(y | I, W) = \log \sum_l p(l | I,W)p(y | l, I ,W)</script><p>通过Jensen不等式可直接得到下界：</p>
+<script type="math/tex; mode=display">
+\log \sum_l p(l | I,W)p(y | l, I ,W) 
+ \geq
+ \sum_l p(l | I,W)  \log p(y | l, I ,W)</script><p>当然，通过观察数据边缘分布的变分下界，假定$q(l)=p(l| I,W)$，也可得到相同的结果：</p>
+<script type="math/tex; mode=display">
+\log p(y|I,W) \geq
+\sum_l q(l) \log \frac{p(y,l |I,W)}{q(l)} =
+\sum_l p(l | I,W)  \log p(y | l, I ,W)</script><p>之后，可以根据这变分下界对模型参数$W$求导，来最大化这个下界。论文（<a href="https://arxiv.org/abs/1502.03044" target="_blank" rel="external">Xu et al., 2015</a>）中也采用了几乎相同的求导策略。</p>
 <h2 id="4-总结"><a href="#4-总结" class="headerlink" title="4 总结"></a>4 总结</h2><p>本文介绍了什么是变分下界以及其在VB方法的地位。本文通过两种不同的方法推导变分下界，并提供它与其他实体关系的清晰思路。本文还通过一个具体的例子展示了如何使用变分下界来获得实用的学习规则，这对理解相关论文非常有用。</p>
 
       
@@ -396,8 +429,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/04/11/关于文章风格的一点思考/" rel="prev" title="关于文章风格的一点思考">
-                关于文章风格的一点思考 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/04/11/Style-Transfer-in-Text-Exploration-and-Evaluation/" rel="prev" title="论文解读《Style Transfer in Text：Exploration and Evaluation》">
+                论文解读《Style Transfer in Text：Exploration and Evaluation》 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
